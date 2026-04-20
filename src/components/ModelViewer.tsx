@@ -12,7 +12,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ children, autoRotate = true }
     <Canvas
       shadows
       camera={{ position: [3, 2, 3], fov: 50 }}
-      style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)" }}
+      style={{ background: "hsl(220, 14%, 7%)" }}
     >
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 8, 5]} intensity={1.1} castShadow />

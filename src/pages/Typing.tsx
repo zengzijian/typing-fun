@@ -339,7 +339,7 @@ function Typing() {
           <select
             value={mode}
             onChange={(e) => handleModeChange(e.target.value as TypingMode)}
-            className="bg-transparent border border-border rounded px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-foreground focus:outline-none focus:border-primary cursor-pointer transition-colors"
+            className="bg-card border border-border rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/40 focus:outline-none focus:border-primary cursor-pointer transition-colors"
           >
             <option value="chinese">中文拼音</option>
             <option value="english">English</option>
