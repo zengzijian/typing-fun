@@ -1,14 +1,17 @@
 /**
- * OEM-profile keycap geometry with per-row specifications.
+ * OEM-profile keycap geometry — values from rsheldiii/KeyV2 oem.scad.
  *
- * Real OEM profile has 4 distinct row heights & tilt angles:
- *   R1 (number row): 11.2mm, 3° tilt
- *   R2 (QWERTY row): 9.4mm, 6° tilt
- *   R3 (home row):    9.0mm, 9° tilt
- *   R4 (bottom row):  9.6mm, 2° tilt
+ * tiltDeg convention (mirrors KeyV2 $top_tilt):
+ *   positive = front edge lower (key face toward typist)
+ *   negative = front edge higher (key face slightly away)
  *
- * Bottom: 18.1×18.1mm, Top: ~12.2×14mm (1u)
- * Dish: cylindrical (curved along X axis)
+ *   R1 (Row 0, number row): 11.2mm, −3° (nearly flat, slight backward lean)
+ *   R2 (Row 1, QWERTY):     9.45mm, +1° (barely forward)
+ *   R3 (Row 2, home):       9.0mm,  +6° (moderate forward lean)
+ *   R4 (Row 3, ZXCV/mod):  9.25mm,  +9° (strong forward lean, faces typist)
+ *
+ * Bottom: 18.05×18.05mm, Top: 12.25×14.05mm (1u real-scale)
+ * Width taper is absolute (fixed per side) so wide keys stay proportional.
  * Project uses 2× scale (U=38mm ≈ 2×19.05mm).
  */
 
@@ -28,10 +31,10 @@ interface ProfileSpec {
 }
 
 const PROFILES: Record<RowProfile, ProfileSpec> = {
-  1: { height: 0.0224, tiltDeg: 3,  topW: 0.67, topD: 0.77, dish: 0.0018 },
-  2: { height: 0.0188, tiltDeg: 6,  topW: 0.67, topD: 0.77, dish: 0.0016 },
-  3: { height: 0.0180, tiltDeg: 9,  topW: 0.67, topD: 0.77, dish: 0.0015 },
-  4: { height: 0.0192, tiltDeg: 2,  topW: 0.67, topD: 0.77, dish: 0.0014 },
+  1: { height: 0.0224, tiltDeg: -3, topW: 0.68, topD: 0.78, dish: 0.002 },
+  2: { height: 0.0189, tiltDeg:  1, topW: 0.68, topD: 0.78, dish: 0.002 },
+  3: { height: 0.0180, tiltDeg:  6, topW: 0.68, topD: 0.78, dish: 0.002 },
+  4: { height: 0.0185, tiltDeg:  9, topW: 0.68, topD: 0.78, dish: 0.002 },
 };
 
 export const KEY_H = PROFILES[3].height;
@@ -107,7 +110,8 @@ export function makeKeycapGeo(
 
   const hw  = w / 2;
   const hd  = d / 2;
-  const thw = hw * prof.topW;
+  // Use fixed absolute taper (= 1U key taper) so wide keys don't over-narrow
+  const thw = hw - (U / 2) * (1 - prof.topW);
   const thd = hd * prof.topD;
 
   const pos: number[] = [];

@@ -1,6 +1,6 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Bounds } from "@react-three/drei";
+import { OrbitControls, Bounds, Center } from "@react-three/drei";
 
 interface ModelViewerProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ children, autoRotate = true }
       <pointLight position={[-4, 4, -4]} intensity={0.25} color="#a0c4ff" />
 
       <Bounds fit clip observe margin={1.4}>
-        {children}
+        <Center>{children}</Center>
       </Bounds>
 
       <OrbitControls

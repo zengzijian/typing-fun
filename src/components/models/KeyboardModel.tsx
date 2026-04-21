@@ -61,15 +61,15 @@ const Key: React.FC<KeyProps> = ({ cx, cz, wu = 1, row = 3, color = C_KEY, label
   </group>
 );
 
-type KeyDef = [number, (string | undefined)?, string?];
+type KeyDef = [number, (string | undefined)?, string?, RowProfile?];
 
 function buildRow(rowIdx: number, row: RowProfile, defs: KeyDef[]): React.ReactElement[] {
   const cz = Z0 + rowIdx * U;
   let x = X0;
-  return defs.map(([wu, color, label], i) => {
+  return defs.map(([wu, color, label, keyRow], i) => {
     const cx = x + (wu * U) / 2;
     x += wu * U;
-    return <Key key={i} cx={cx} cz={cz} wu={wu} row={row} color={color} label={label} />;
+    return <Key key={i} cx={cx} cz={cz} wu={wu} row={keyRow ?? row} color={color} label={label} />;
   });
 }
 

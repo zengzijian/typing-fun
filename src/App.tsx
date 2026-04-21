@@ -3,6 +3,7 @@ import Navigation from "./components/Navigation";
 import Typing from "./pages/Typing";
 import Models from "./pages/Models";
 import ModelDetail from "./pages/ModelDetail";
+import MechGame from "./pages/MechGame";
 import "./App.css";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
             <Route path="/typing" element={<Typing />} />
             <Route path="/models" element={<Models />} />
             <Route path="/model/detail" element={<ModelDetail />} />
+            <Route path="/mech-game" element={<MechGame />} />
           </Routes>
         </main>
       </div>

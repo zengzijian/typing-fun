@@ -1,8 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Keyboard, Box } from "lucide-react";
+import { Keyboard, Box, Crosshair } from "lucide-react";
 
 const navItems = [
   { path: "/typing", label: "打字", icon: Keyboard },
+  { path: "/mech-game", label: "机甲游戏", icon: Crosshair },
   { path: "/models", label: "模型库", icon: Box },
 ];
 
