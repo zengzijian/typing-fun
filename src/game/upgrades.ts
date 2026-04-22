@@ -1,4 +1,4 @@
-import type { UpgradeOption, GameEngineState } from './types'
+import type { UpgradeOption } from './types'
 
 export const ALL_UPGRADES: UpgradeOption[] = [
   {
@@ -20,7 +20,7 @@ export const ALL_UPGRADES: UpgradeOption[] = [
     label: '急速射击',
     description: '射击动画加速30%，提升输出节奏',
     category: 'weapon',
-    apply: (s) => { /* turret animation speed handled in renderer */ },
+    apply: (_s) => { /* turret animation speed handled in renderer */ },
   },
   {
     id: 'shield_up',

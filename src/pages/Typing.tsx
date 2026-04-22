@@ -217,7 +217,6 @@ function Typing() {
                 const isCurrent = index === currentIndex
                 const isPending = status === 'pending' && !isCurrent
                 const isCorrect = status === 'correct'
-                const isError = status === 'error'
 
                 return (
                   <div

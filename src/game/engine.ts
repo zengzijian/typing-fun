@@ -104,19 +104,6 @@ export function startGame(state: GameEngineState): GameEngineState {
   }
 }
 
-function autoTurretTick(state: GameEngineState, dt: number): GameEngineState {
-  if (state.autoTurretCooldown <= 0) return state
-  // not purchased yet (initial value 0 means inactive, positive means purchased and counting)
-  if (!state.upgrades.includes('auto_turret')) return state
-
-  let nextState = { ...state }
-
-  // Use a separate timer tracked in upgrades store — here we approximate by subtracting dt each frame
-  // We store the remaining cooldown as a negative number hack: autoTurretCooldown starts at 10 when purchased
-  // We need a separate field — but to avoid changing types mid-flight, use nextSpawnTime as proxy...
-  // Actually, let's just handle it simply: track last auto time in a closure via module-level variable
-  return nextState
-}
 
 let autoTurretTimer = 10
 
