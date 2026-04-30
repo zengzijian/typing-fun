@@ -3,6 +3,7 @@ import { wordList } from '@/data/words'
 import { englishWordList } from '@/data/englishWords'
 import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
+import { TypingResults, type TypingEvent } from '@/components/TypingResults'
 
 type WordStatus = 'pending' | 'correct' | 'error'
 type CursorStyle = 'caret' | 'pulse'
@@ -62,6 +63,7 @@ function Typing() {
   const [cursorStyle, setCursorStyle] = useState<CursorStyle>('caret')
 
   const currentWordRef = useRef<HTMLDivElement>(null)
+  const typingEventsRef = useRef<TypingEvent[]>([])
 
   const initGame = (limit: number, nextMode: TypingMode = mode) => {
     setWords(toGameWords(nextMode))
@@ -74,6 +76,7 @@ function Typing() {
     setIsComplete(false)
     setCorrectCount(0)
     setWpm(0)
+    typingEventsRef.current = []
   }
 
   const handleModeChange = (nextMode: TypingMode) => {
@@ -140,6 +143,8 @@ function Typing() {
 
         const currentWord = words[currentIndex]
         const isCorrect = currentInput === currentWord.target
+        const elapsed = timeLimit - timeLeft
+        typingEventsRef.current = [...typingEventsRef.current, { elapsed, correct: isCorrect }]
 
         setStatuses((prev) => {
           const newStatuses = [...prev]
@@ -388,41 +393,15 @@ function Typing() {
         </div>
 
         {isComplete && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-            <div className="bg-card border border-border rounded-lg p-12 text-center max-w-md">
-              <h2 className="text-4xl font-bold text-primary mb-4">
-                {mode === 'chinese' ? '完成！' : 'Done!'}
-              </h2>
-              <div className="space-y-4 text-2xl">
-                <div>
-                  <span className="text-muted-foreground">WPM: </span>
-                  <span className="text-foreground font-bold">{wpm}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">正确数: </span>
-                  <span className="text-foreground font-bold">
-                    {correctCount}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">准确率: </span>
-                  <span className="text-foreground font-bold">
-                    {currentIndex > 0
-                      ? Math.round((correctCount / currentIndex) * 100)
-                      : 0}
-                    %
-                  </span>
-                </div>
-              </div>
-              <Button
-                onClick={() => initGame(timeLimit)}
-                className="mt-8"
-                size="lg"
-              >
-                {mode === 'chinese' ? '再来一次' : 'Try Again'}
-              </Button>
-            </div>
-          </div>
+          <TypingResults
+            events={typingEventsRef.current}
+            timeLimit={timeLimit}
+            wpm={wpm}
+            correctCount={correctCount}
+            totalCount={currentIndex}
+            mode={mode}
+            onRetry={() => initGame(timeLimit)}
+          />
         )}
       </div>
     </div>
