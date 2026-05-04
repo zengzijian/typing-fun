@@ -1,11 +1,12 @@
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from 'recharts'
 import { Button } from '@/components/ui/button'
 
@@ -22,17 +23,17 @@ type Props = {
 }
 
 function computeChartData(events: TypingEvent[], timeLimit: number) {
-  const bucketCount = 6
-  const bucketSize = timeLimit / bucketCount
+  const bucketSize = 5
+  const bucketCount = Math.ceil(timeLimit / bucketSize)
 
   return Array.from({ length: bucketCount }, (_, i) => {
     const start = i * bucketSize
-    const end = (i + 1) * bucketSize
+    const end = Math.min((i + 1) * bucketSize, timeLimit)
     const bucket = events.filter((e) => e.elapsed >= start && e.elapsed < end)
     const correct = bucket.filter((e) => e.correct).length
     const errors = bucket.filter((e) => !e.correct).length
     return {
-      time: `${Math.round(start)}s`,
+      time: `${start}s`,
       wpm: Math.round(correct * (60 / bucketSize)),
       errors,
     }
@@ -82,7 +83,7 @@ export function TypingResults({
             {mode === 'chinese' ? '每段 WPM' : 'WPM over time'}
           </div>
           <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={chartData} barGap={4}>
+            <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
               <XAxis
                 dataKey="time"
@@ -103,11 +104,29 @@ export function TypingResults({
                   borderRadius: '6px',
                   fontSize: 12,
                 }}
-                cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+                cursor={{ stroke: 'hsl(var(--border))' }}
               />
-              <Bar dataKey="wpm" name="WPM" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="errors" name={mode === 'chinese' ? '错误' : 'Errors'} fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} opacity={0.7} />
-            </BarChart>
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Line
+                type="monotone"
+                dataKey="wpm"
+                name="WPM"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                dot={{ r: 3, fill: 'hsl(var(--primary))' }}
+                activeDot={{ r: 5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="errors"
+                name={mode === 'chinese' ? '错误' : 'Errors'}
+                stroke="hsl(var(--destructive))"
+                strokeWidth={2}
+                strokeOpacity={0.7}
+                dot={{ r: 3, fill: 'hsl(var(--destructive))' }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </div>
 
