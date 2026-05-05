@@ -1,0 +1,102 @@
+{
+  "nav": {
+    "typing": "打字",
+    "mechGame": "機甲遊戲",
+    "models": "模型庫"
+  },
+  "lang": {
+    "toggle": "EN",
+    "zh": "簡",
+    "en": "EN",
+    "zhHK": "繁"
+  },
+  "typing": {
+    "slogan": "Looks like work. Feels like play.",
+    "modeZh": "中文拼音",
+    "modeEn": "English",
+    "focusEnter": "專注模式 (F2)",
+    "focusExit": "退出專注模式 (F2)",
+    "themeLight": "切換淺色主題",
+    "themeDark": "切換深色主題",
+    "camouflage": "摸魚模式"
+  },
+  "results": {
+    "title": "完成！",
+    "wpm": "WPM",
+    "accuracy": "準確率",
+    "correct": "正確詞數",
+    "chart": "每段 WPM",
+    "errors": "錯誤",
+    "retry": "再來一次"
+  },
+  "models": {
+    "title": "模型庫",
+    "hint": "點擊模型進入預覽，支援旋轉與縮放",
+    "notFound": "未找到模型「{{name}}」",
+    "back": "← 返回模型庫",
+    "backShort": "返回"
+  },
+  "modelData": {
+    "table": { "name": "桌子", "desc": "實木辦公桌，帶四條桌腿" },
+    "chair": { "name": "椅子", "desc": "木質椅子，帶雙橫梁靠背" },
+    "monitor": { "name": "顯示器", "desc": "寬屏顯示器，帶頸部支架和底座" },
+    "keyboard": { "name": "鍵盤", "desc": "全尺寸薄膜鍵盤" },
+    "mouse": { "name": "滑鼠", "desc": "光學滑鼠，帶滾輪" },
+    "keycapR1": { "name": "鍵帽 R1", "desc": "數字行 — 11.2mm，後仰 3°" },
+    "keycapR2": { "name": "鍵帽 R2", "desc": "QWERTY 行 — 9.45mm，前傾 1°" },
+    "keycapR3": { "name": "鍵帽 R3", "desc": "Home 行 — 9.0mm，前傾 6°" },
+    "keycapR4": { "name": "鍵帽 R4", "desc": "底行 — 9.25mm，前傾 9°" },
+    "keycap2u": { "name": "鍵帽 2u", "desc": "Backspace / Left Shift (R1)" },
+    "keycap225u": { "name": "鍵帽 2.25u", "desc": "Enter (R3)" },
+    "keycap625u": { "name": "鍵帽 6.25u", "desc": "Space (R4) — 6.25u" }
+  },
+  "game": {
+    "title": "MECH DEFENDER",
+    "subtitle": "機甲守護者 — 打字防禦遊戲",
+    "modeZh": "中文拼音",
+    "modeEn": "English",
+    "desc1": "消滅所有入侵的機甲單位，保護中心核心",
+    "desc2": "輸入敵人上方的文字將其摧毀",
+    "deleteHint": "刪除",
+    "pauseHint": "暫停",
+    "start": "START GAME",
+    "startHint": "按 Enter 或 Space 快速開始",
+    "paused": "PAUSED",
+    "pausedHint": "按 ESC 繼續遊戲",
+    "waveClear": "WAVE CLEAR",
+    "waveClearMsg": "Wave {{wave}} 已清除！",
+    "waveClearHint": "按 Enter / Space 繼續下一波",
+    "levelComplete": "LEVEL {{level}} COMPLETE",
+    "chooseUpgrade": "選擇一項升級",
+    "upgradeHint": "輸入 A / B / C 選擇，或直接點擊",
+    "gameOver": "GAME OVER",
+    "score": "Score:",
+    "maxCombo": "Max Combo:",
+    "reachedLevel": "Reached Level:",
+    "retry": "RETRY",
+    "retryHint": "按 Enter / Space 返回主選單",
+    "victory": "VICTORY",
+    "victoryMsg": "你已消滅所有入侵機甲！",
+    "finalScore": "Final Score:",
+    "playAgain": "PLAY AGAIN",
+    "highScore": "歷史最高",
+    "bestCombo": "最佳連擊",
+    "newRecord": "新紀錄！",
+    "mute": "靜音",
+    "unmute": "取消靜音"
+  },
+  "upgrades": {
+    "piercing": { "name": "穿透彈", "desc": "子彈命中後繼續飛行，可貫穿多個敵人" },
+    "chainExplosion": { "name": "連鎖爆炸", "desc": "擊殺敵人後，周圍50px內敵人受到1點傷害" },
+    "rapidFire": { "name": "急速射擊", "desc": "射擊動畫加速30%，提升輸出節奏" },
+    "shieldUp": { "name": "護盾強化", "desc": "中心點最大HP +1" },
+    "slowField": { "name": "減速磁場", "desc": "所有敵人移速降低15%" },
+    "autoTurret": { "name": "自動炮台", "desc": "每10秒自動消滅距離最近的敵人" },
+    "wordReveal": { "name": "詞語預警", "desc": "敵人出現時高亮顯示完整拼音提示" },
+    "timeBonus": { "name": "時間壓縮", "desc": "每關倒計時延長15秒" },
+    "critBonus": { "name": "爆擊加成", "desc": "連續5次無誤擊殺後，下個敵人瞬間消滅" },
+    "areaBomb": { "name": "範圍轟炸", "desc": "按Tab鍵對中心220px內所有敵人造成1點傷害，30s冷卻" },
+    "wordFreeze": { "name": "詞語凍結", "desc": "擊殺時30%概率凍結附近100px內敵人1.5秒" },
+    "scoreSurge": { "name": "分數湧現", "desc": "連續8次擊殺後，接下來5次擊殺分數×3" }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "nav": {
+    "typing": "Typing",
+    "mechGame": "Mech Game",
+    "models": "Models"
+  },
+  "lang": {
+    "zh": "简",
+    "zhHK": "繁",
+    "en": "EN"
+  },
+  "typing": {
+    "slogan": "Looks like work. Feels like play.",
+    "modeZh": "Chinese Pinyin",
+    "modeEn": "English",
+    "focusEnter": "Focus mode (F2)",
+    "focusExit": "Exit focus mode (F2)",
+    "themeLight": "Switch to light theme",
+    "themeDark": "Switch to dark theme",
+    "camouflage": "IDE camouflage"
+  },
+  "results": {
+    "title": "Done!",
+    "wpm": "WPM",
+    "accuracy": "Accuracy",
+    "correct": "Correct",
+    "chart": "WPM over time",
+    "errors": "Errors",
+    "retry": "Try Again"
+  },
+  "models": {
+    "title": "Models",
+    "hint": "Click a model to preview — supports rotation and zoom",
+    "notFound": "Model not found: \"{{name}}\"",
+    "back": "← Back to Models",
+    "backShort": "Back"
+  },
+  "modelData": {
+    "table": { "name": "Table", "desc": "Solid wood desk with four legs" },
+    "chair": { "name": "Chair", "desc": "Wooden chair with double crossbar backrest" },
+    "monitor": { "name": "Monitor", "desc": "Widescreen monitor with neck support and stand" },
+    "keyboard": { "name": "Keyboard", "desc": "Full-size membrane keyboard" },
+    "mouse": { "name": "Mouse", "desc": "Optical mouse with scroll wheel" },
+    "keycapR1": { "name": "Keycap R1", "desc": "Number row — 11.2mm, 3° backward tilt" },
+    "keycapR2": { "name": "Keycap R2", "desc": "QWERTY row — 9.45mm, 1° forward tilt" },
+    "keycapR3": { "name": "Keycap R3", "desc": "Home row — 9.0mm, 6° forward tilt" },
+    "keycapR4": { "name": "Keycap R4", "desc": "Bottom row — 9.25mm, 9° forward tilt" },
+    "keycap2u": { "name": "Keycap 2u", "desc": "Backspace / Left Shift (R1)" },
+    "keycap225u": { "name": "Keycap 2.25u", "desc": "Enter (R3)" },
+    "keycap625u": { "name": "Keycap 6.25u", "desc": "Space (R4) — 6.25u" }
+  },
+  "game": {
+    "title": "MECH DEFENDER",
+    "subtitle": "Type to destroy — defend the core",
+    "modeZh": "Chinese Pinyin",
+    "modeEn": "English",
+    "desc1": "Destroy all invading mech units and protect the center core",
+    "desc2": "Type the text above enemies to eliminate them",
+    "deleteHint": "Delete",
+    "pauseHint": "Pause",
+    "start": "START GAME",
+    "startHint": "Press Enter or Space to start",
+    "paused": "PAUSED",
+    "pausedHint": "Press ESC to resume",
+    "waveClear": "WAVE CLEAR",
+    "waveClearMsg": "Wave {{wave}} cleared!",
+    "waveClearHint": "Press Enter / Space to continue",
+    "levelComplete": "LEVEL {{level}} COMPLETE",
+    "chooseUpgrade": "Choose an upgrade",
+    "upgradeHint": "Type A / B / C or click to select",
+    "gameOver": "GAME OVER",
+    "score": "Score:",
+    "maxCombo": "Max Combo:",
+    "reachedLevel": "Reached Level:",
+    "retry": "RETRY",
+    "retryHint": "Press Enter / Space to return to menu",
+    "victory": "VICTORY",
+    "victoryMsg": "All invading mechs have been destroyed!",
+    "finalScore": "Final Score:",
+    "playAgain": "PLAY AGAIN",
+    "highScore": "Best Score",
+    "bestCombo": "Best Combo",
+    "newRecord": "New Record!",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  },
+  "upgrades": {
+    "piercing": { "name": "Piercing Shot", "desc": "Bullets continue after hit, piercing multiple enemies" },
+    "chainExplosion": { "name": "Chain Explosion", "desc": "Killing an enemy deals 1 damage to all within 50px" },
+    "rapidFire": { "name": "Rapid Fire", "desc": "Turret animation 30% faster, improving output rhythm" },
+    "shieldUp": { "name": "Shield Boost", "desc": "Core max HP +1" },
+    "slowField": { "name": "Slow Field", "desc": "All enemies move 15% slower" },
+    "autoTurret": { "name": "Auto Turret", "desc": "Automatically eliminates the nearest enemy every 10s" },
+    "wordReveal": { "name": "Word Alert", "desc": "Highlights full pinyin hint when an enemy appears" },
+    "timeBonus": { "name": "Time Extension", "desc": "Countdown extended by 15s per level" },
+    "critBonus": { "name": "Critical Hit", "desc": "5 consecutive perfect kills instantly destroys the next enemy" },
+    "areaBomb": { "name": "Area Bomb", "desc": "Press Tab to deal 1 damage to all enemies within 220px of center, 30s cooldown" },
+    "wordFreeze": { "name": "Word Freeze", "desc": "30% chance to freeze nearby enemies within 100px for 1.5s on kill" },
+    "scoreSurge": { "name": "Score Surge", "desc": "After 8 consecutive kills, the next 5 kills score ×3" }
+  }
+}

@@ -463,6 +463,33 @@ export const themes: Theme[] = [
       ring: '221 100% 75%',
     },
   },
+  {
+    id: 'vscode-light',
+    name: 'VS Code Light',
+    preview: '#007acc',
+    preview2: '#ffffff',
+    vars: {
+      background: '0 0% 100%',
+      foreground: '0 0% 12%',
+      card: '0 0% 95%',
+      'card-foreground': '0 0% 12%',
+      popover: '0 0% 100%',
+      'popover-foreground': '0 0% 12%',
+      primary: '207 100% 40%',
+      'primary-foreground': '0 0% 100%',
+      secondary: '0 0% 92%',
+      'secondary-foreground': '0 0% 12%',
+      muted: '0 0% 46%',
+      'muted-foreground': '0 0% 40%',
+      accent: '205 68% 45%',
+      'accent-foreground': '0 0% 100%',
+      destructive: '0 72% 51%',
+      'destructive-foreground': '0 0% 100%',
+      border: '0 0% 88%',
+      input: '0 0% 92%',
+      ring: '207 100% 40%',
+    },
+  },
 ]
 
 export const defaultThemeId = 'amber'

@@ -9,6 +9,7 @@ import {
   Legend,
 } from 'recharts'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 
 export type TypingEvent = { elapsed: number; correct: boolean }
 
@@ -18,7 +19,6 @@ type Props = {
   wpm: number
   correctCount: number
   totalCount: number
-  mode: 'chinese' | 'english'
   onRetry: () => void
 }
 
@@ -46,9 +46,9 @@ export function TypingResults({
   wpm,
   correctCount,
   totalCount,
-  mode,
   onRetry,
 }: Props) {
+  const { t } = useTranslation()
   const accuracy = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0
   const chartData = computeChartData(events, timeLimit)
 
@@ -56,32 +56,26 @@ export function TypingResults({
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-card border border-border rounded-lg p-8 w-full max-w-2xl">
         <h2 className="text-3xl font-bold text-primary mb-6 text-center">
-          {mode === 'chinese' ? '完成！' : 'Done!'}
+          {t('results.title')}
         </h2>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground">{wpm}</div>
-            <div className="text-sm text-muted-foreground mt-1">WPM</div>
+            <div className="text-sm text-muted-foreground mt-1">{t('results.wpm')}</div>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground">{accuracy}%</div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {mode === 'chinese' ? '准确率' : 'Accuracy'}
-            </div>
+            <div className="text-sm text-muted-foreground mt-1">{t('results.accuracy')}</div>
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-foreground">{correctCount}</div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {mode === 'chinese' ? '正确词数' : 'Correct'}
-            </div>
+            <div className="text-sm text-muted-foreground mt-1">{t('results.correct')}</div>
           </div>
         </div>
 
         <div className="mb-6">
-          <div className="text-sm text-muted-foreground mb-3">
-            {mode === 'chinese' ? '每段 WPM' : 'WPM over time'}
-          </div>
+          <div className="text-sm text-muted-foreground mb-3">{t('results.chart')}</div>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -110,7 +104,7 @@ export function TypingResults({
               <Line
                 type="monotone"
                 dataKey="wpm"
-                name="WPM"
+                name={t('results.wpm')}
                 stroke="hsl(var(--primary))"
                 strokeWidth={2}
                 dot={{ r: 3, fill: 'hsl(var(--primary))' }}
@@ -119,7 +113,7 @@ export function TypingResults({
               <Line
                 type="monotone"
                 dataKey="errors"
-                name={mode === 'chinese' ? '错误' : 'Errors'}
+                name={t('results.errors')}
                 stroke="hsl(var(--destructive))"
                 strokeWidth={2}
                 strokeOpacity={0.7}
@@ -132,7 +126,7 @@ export function TypingResults({
 
         <div className="text-center">
           <Button onClick={onRetry} size="lg">
-            {mode === 'chinese' ? '再来一次' : 'Try Again'}
+            {t('results.retry')}
           </Button>
         </div>
       </div>

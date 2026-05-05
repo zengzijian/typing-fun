@@ -2,21 +2,23 @@ import { useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import ModelViewer from "../components/ModelViewer";
 import { MODEL_LIST } from "../data/models";
+import { useTranslation } from "react-i18next";
 
 const ModelDetail = () => {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const name = searchParams.get("name");
   const model = MODEL_LIST.find((m) => m.id === name);
 
   if (!model) {
     return (
       <div className="min-h-full bg-background text-foreground flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">未找到模型「{name}」</p>
+        <p className="text-muted-foreground">{t("models.notFound", { name })}</p>
         <Link
           to="/models"
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← 返回模型库
+          {t("models.back")}
         </Link>
       </div>
     );
@@ -30,11 +32,11 @@ const ModelDetail = () => {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          返回
+          {t("models.backShort")}
         </Link>
         <span className="text-border">|</span>
-        <span className="text-sm font-medium text-foreground">{model.name}</span>
-        <span className="text-muted-foreground text-sm">{model.description}</span>
+        <span className="text-sm font-medium text-foreground">{t(model.nameKey)}</span>
+        <span className="text-muted-foreground text-sm">{t(model.descKey)}</span>
       </div>
       <div className="flex-1">
         <ModelViewer autoRotate={false}>{model.component}</ModelViewer>

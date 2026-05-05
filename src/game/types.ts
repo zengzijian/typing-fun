@@ -1,3 +1,5 @@
+import type { SoundEvent } from './audio'
+
 export type GameState = 'MENU' | 'PLAYING' | 'PAUSED' | 'WAVE_CLEAR' | 'UPGRADE' | 'GAME_OVER' | 'VICTORY'
 
 export type EnemyType = 'infantry' | 'tank' | 'speeder' | 'elite' | 'boss'
@@ -22,6 +24,12 @@ export interface Enemy {
   dead: boolean
   exploding: boolean
   explosionTimer: number
+  // path system
+  waypoints?: { x: number; y: number }[]
+  waypointIndex?: number
+  // freeze system
+  frozen?: boolean
+  frozenTimer?: number
 }
 
 export interface Projectile {
@@ -57,8 +65,8 @@ export interface Turret {
 
 export interface UpgradeOption {
   id: string
-  label: string
-  description: string
+  nameKey: string
+  descKey: string
   category: 'weapon' | 'defense' | 'utility'
   apply: (state: GameEngineState) => void
 }
@@ -99,6 +107,16 @@ export interface GameEngineState {
   critStreak: number      // consecutive kills without mistake for crit
   critStreakCount: number
   timeBonusSeconds: number
+  // wave progress tracking
+  waveEnemyTotal: number
+  // area bomb
+  areaBombCooldown: number
+  // score surge upgrade (8 kill streak → next 5 kills ×3)
+  scoreSurgeStreak: number
+  scoreSurgeKills: number
+  // feedback events (consumed each frame by MechGame)
+  pendingEvents: SoundEvent[]
+  pendingShake: number    // screen shake intensity (0 = none)
 }
 
 export interface SpawnEntry {
@@ -116,3 +134,5 @@ export interface LevelConfig {
   maxEnemies: number
   hasBoss: boolean
 }
+
+export type { SoundEvent }

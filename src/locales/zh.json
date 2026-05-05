@@ -1,0 +1,101 @@
+{
+  "nav": {
+    "typing": "打字",
+    "mechGame": "机甲游戏",
+    "models": "模型库"
+  },
+  "lang": {
+    "zh": "简",
+    "zhHK": "繁",
+    "en": "EN"
+  },
+  "typing": {
+    "slogan": "Looks like work. Feels like play.",
+    "modeZh": "中文拼音",
+    "modeEn": "English",
+    "focusEnter": "专注模式 (F2)",
+    "focusExit": "退出专注模式 (F2)",
+    "themeLight": "切换浅色主题",
+    "themeDark": "切换深色主题",
+    "camouflage": "摸鱼模式"
+  },
+  "results": {
+    "title": "完成！",
+    "wpm": "WPM",
+    "accuracy": "准确率",
+    "correct": "正确词数",
+    "chart": "每段 WPM",
+    "errors": "错误",
+    "retry": "再来一次"
+  },
+  "models": {
+    "title": "模型库",
+    "hint": "点击模型进入预览，支持旋转与缩放",
+    "notFound": "未找到模型「{{name}}」",
+    "back": "← 返回模型库",
+    "backShort": "返回"
+  },
+  "modelData": {
+    "table": { "name": "桌子", "desc": "实木办公桌，带四条桌腿" },
+    "chair": { "name": "椅子", "desc": "木质椅子，带双横梁靠背" },
+    "monitor": { "name": "显示器", "desc": "宽屏显示器，带颈部支架和底座" },
+    "keyboard": { "name": "键盘", "desc": "全尺寸薄膜键盘" },
+    "mouse": { "name": "鼠标", "desc": "光学鼠标，带滚轮" },
+    "keycapR1": { "name": "键帽 R1", "desc": "数字行 — 11.2mm，后仰 3°" },
+    "keycapR2": { "name": "键帽 R2", "desc": "QWERTY 行 — 9.45mm，前倾 1°" },
+    "keycapR3": { "name": "键帽 R3", "desc": "Home 行 — 9.0mm，前倾 6°" },
+    "keycapR4": { "name": "键帽 R4", "desc": "底行 — 9.25mm，前倾 9°" },
+    "keycap2u": { "name": "键帽 2u", "desc": "Backspace / Left Shift (R1)" },
+    "keycap225u": { "name": "键帽 2.25u", "desc": "Enter (R3)" },
+    "keycap625u": { "name": "键帽 6.25u", "desc": "Space (R4) — 6.25u" }
+  },
+  "game": {
+    "title": "MECH DEFENDER",
+    "subtitle": "机甲守护者 — 打字防御游戏",
+    "modeZh": "中文拼音",
+    "modeEn": "English",
+    "desc1": "消灭所有入侵的机甲单位，保护中心核心",
+    "desc2": "输入敌人上方的文字将其摧毁",
+    "deleteHint": "删除",
+    "pauseHint": "暂停",
+    "start": "START GAME",
+    "startHint": "按 Enter 或 Space 快速开始",
+    "paused": "PAUSED",
+    "pausedHint": "按 ESC 继续游戏",
+    "waveClear": "WAVE CLEAR",
+    "waveClearMsg": "Wave {{wave}} 已清除！",
+    "waveClearHint": "按 Enter / Space 继续下一波",
+    "levelComplete": "LEVEL {{level}} COMPLETE",
+    "chooseUpgrade": "选择一项升级",
+    "upgradeHint": "输入 A / B / C 选择，或直接点击",
+    "gameOver": "GAME OVER",
+    "score": "Score:",
+    "maxCombo": "Max Combo:",
+    "reachedLevel": "Reached Level:",
+    "retry": "RETRY",
+    "retryHint": "按 Enter / Space 返回主菜单",
+    "victory": "VICTORY",
+    "victoryMsg": "你已消灭所有入侵机甲！",
+    "finalScore": "Final Score:",
+    "playAgain": "PLAY AGAIN",
+    "highScore": "历史最高",
+    "bestCombo": "最佳连击",
+    "newRecord": "新纪录！",
+    "mute": "静音",
+    "unmute": "取消静音"
+  },
+  "upgrades": {
+    "piercing": { "name": "穿透弹", "desc": "子弹命中后继续飞行，可贯穿多个敌人" },
+    "chainExplosion": { "name": "连锁爆炸", "desc": "击杀敌人后，周围50px内敌人受到1点伤害" },
+    "rapidFire": { "name": "急速射击", "desc": "射击动画加速30%，提升输出节奏" },
+    "shieldUp": { "name": "护盾强化", "desc": "中心点最大HP +1" },
+    "slowField": { "name": "减速磁场", "desc": "所有敌人移速降低15%" },
+    "autoTurret": { "name": "自动炮台", "desc": "每10秒自动消灭距离最近的敌人" },
+    "wordReveal": { "name": "词语预警", "desc": "敌人出现时高亮显示完整拼音提示" },
+    "timeBonus": { "name": "时间压缩", "desc": "每关倒计时延长15秒" },
+    "critBonus": { "name": "爆击加成", "desc": "连续5次无误击杀后，下个敌人瞬间消灭" },
+    "areaBomb": { "name": "范围轰炸", "desc": "按Tab键对中心220px内所有敌人造成1点伤害，30s冷却" },
+    "wordFreeze": { "name": "词语冻结", "desc": "击杀时30%概率冻结附近100px内敌人1.5秒" },
+    "scoreSurge": { "name": "分数涌现", "desc": "连续8次击杀后，接下来5次击杀分数×3" }
+  }
+}

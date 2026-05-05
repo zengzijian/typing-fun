@@ -1,16 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import ModelViewer from "../components/ModelViewer";
 import { MODEL_LIST } from "../data/models";
+import { useTranslation } from "react-i18next";
 
 const Models = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-full bg-background text-foreground">
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-xl font-semibold mb-1">模型库</h1>
+        <h1 className="text-xl font-semibold mb-1">{t("models.title")}</h1>
         <p className="text-muted-foreground text-sm mb-8">
-          点击模型进入预览，支持旋转与缩放
+          {t("models.hint")}
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -26,9 +28,9 @@ const Models = () => {
               </div>
 
               <div className="px-4 py-3 border-t border-border">
-                <p className="font-medium text-sm text-foreground">{model.name}</p>
+                <p className="font-medium text-sm text-foreground">{t(model.nameKey)}</p>
                 <p className="text-muted-foreground text-xs mt-0.5 line-clamp-1">
-                  {model.description}
+                  {t(model.descKey)}
                 </p>
               </div>
             </button>

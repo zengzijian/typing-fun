@@ -1,4 +1,4 @@
-import type { GameEngineState, Language } from './types'
+import type { GameEngineState, Language, SoundEvent } from './types'
 import { CENTER_X, CENTER_Y, CENTER_RADIUS, CANVAS_WIDTH, CANVAS_HEIGHT } from './constants'
 import { createTurret, updateTurret, aimTurret, fireTurret, updateProjectiles, drawTurret, drawProjectiles } from './turret'
 import { createEnemy, updateEnemies, drawEnemy } from './enemies'
@@ -10,22 +10,18 @@ import { pickUpgradeOptions } from './upgrades'
 
 type StateChangeCallback = (state: GameEngineState) => void
 
-export function createInitialState(canvas: HTMLCanvasElement, lang: Language): GameEngineState {
+const EMPTY_EVENTS: SoundEvent[] = []
+
+function baseState(canvas: HTMLCanvasElement, lang: Language): Omit<GameEngineState, 'gameState' | 'level' | 'wave' | 'totalWaves' | 'timer' | 'enemies' | 'spawnQueue' | 'waveEnemyTotal'> {
   const ctx = canvas.getContext('2d')!
   return {
     canvas, ctx,
-    gameState: 'MENU',
     language: lang,
-    level: 1,
-    wave: 1,
-    totalWaves: 2,
-    timer: 60,
     score: 0,
     combo: 0,
     maxCombo: 0,
     centerHp: 3,
     maxCenterHp: 3,
-    enemies: [],
     projectiles: [],
     particles: [],
     turret: createTurret(),
@@ -33,7 +29,6 @@ export function createInitialState(canvas: HTMLCanvasElement, lang: Language): G
     activeEnemyId: null,
     lastTime: 0,
     rafId: null,
-    spawnQueue: [],
     nextSpawnTime: 0,
     upgrades: [],
     upgradeOptions: [],
@@ -46,6 +41,44 @@ export function createInitialState(canvas: HTMLCanvasElement, lang: Language): G
     critStreak: 0,
     critStreakCount: 0,
     timeBonusSeconds: 0,
+    areaBombCooldown: 0,
+    scoreSurgeStreak: 0,
+    scoreSurgeKills: 0,
+    pendingEvents: EMPTY_EVENTS,
+    pendingShake: 0,
+  }
+}
+
+export function createInitialState(canvas: HTMLCanvasElement, lang: Language): GameEngineState {
+  return {
+    ...baseState(canvas, lang),
+    gameState: 'MENU',
+    level: 1,
+    wave: 1,
+    totalWaves: 2,
+    timer: 60,
+    enemies: [],
+    spawnQueue: [],
+    waveEnemyTotal: 0,
+  }
+}
+
+export function startGame(state: GameEngineState): GameEngineState {
+  resetWordSystem()
+  const config = getLevelConfig(1)
+  const schedule = buildSpawnSchedule(config, 1)
+  return {
+    ...state,
+    ...baseState(state.canvas, state.language),
+    language: state.language,
+    gameState: 'PLAYING',
+    level: 1,
+    wave: 1,
+    totalWaves: config.waves,
+    timer: config.duration,
+    enemies: [],
+    spawnQueue: schedule,
+    waveEnemyTotal: schedule.length,
   }
 }
 
@@ -65,47 +98,14 @@ export function startLevel(state: GameEngineState): GameEngineState {
     inputBuffer: '',
     activeEnemyId: null,
     turret: createTurret(),
+    waveEnemyTotal: schedule.length,
+    pendingEvents: EMPTY_EVENTS,
+    pendingShake: 0,
   }
 }
-
-export function startGame(state: GameEngineState): GameEngineState {
-  resetWordSystem()
-  const config = getLevelConfig(1)
-  return {
-    ...state,
-    level: 1,
-    wave: 1,
-    score: 0,
-    combo: 0,
-    maxCombo: 0,
-    centerHp: 3,
-    maxCenterHp: 3,
-    upgrades: [],
-    upgradeInput: '',
-    speedMultiplier: 1,
-    autoTurretCooldown: 0,
-    chainExplosion: false,
-    piercing: false,
-    wordReveal: false,
-    critStreak: 0,
-    critStreakCount: 0,
-    timeBonusSeconds: 0,
-    totalWaves: config.waves,
-    timer: config.duration,
-    gameState: 'PLAYING',
-    enemies: [],
-    projectiles: [],
-    particles: [],
-    spawnQueue: buildSpawnSchedule(config, 1),
-    nextSpawnTime: 0,
-    inputBuffer: '',
-    activeEnemyId: null,
-    turret: createTurret(),
-  }
-}
-
 
 let autoTurretTimer = 10
+let areaBombTimer = 0
 
 export function gameLoop(
   state: GameEngineState,
@@ -115,7 +115,13 @@ export function gameLoop(
   if (state.gameState !== 'PLAYING') return state
 
   const dt = Math.min((timestamp - state.lastTime) / 1000, 0.05)
-  let s = { ...state, lastTime: timestamp }
+  let s: GameEngineState = { ...state, lastTime: timestamp, pendingEvents: EMPTY_EVENTS, pendingShake: 0 }
+
+  // area bomb cooldown
+  if (s.upgrades.includes('area_bomb') && areaBombTimer > 0) {
+    areaBombTimer = Math.max(0, areaBombTimer - dt)
+    s.areaBombCooldown = areaBombTimer
+  }
 
   // spawn enemies
   s.nextSpawnTime = (s.nextSpawnTime ?? 0) - dt
@@ -163,10 +169,15 @@ export function gameLoop(
         s.enemies = s.enemies.map(en => en.id === e.id ? { ...en, dead: true } : en)
         s.centerHp = s.centerHp - 1
         s.combo = 0
+        s.scoreSurgeStreak = 0
         s.particles = [...s.particles, ...createExplosion(CENTER_X, CENTER_Y, '#ef444488', 8)]
+        const shakeIntensity = e.type === 'boss' ? 10 : 4
+        s.pendingEvents = [...s.pendingEvents, 'center_hit']
+        s.pendingShake = Math.max(s.pendingShake, shakeIntensity)
         if (s.centerHp <= 0) {
-          onStateChange({ ...s, gameState: 'GAME_OVER' })
-          return { ...s, gameState: 'GAME_OVER' }
+          const final = { ...s, gameState: 'GAME_OVER' as const, pendingEvents: [...s.pendingEvents, 'game_over' as const], pendingShake: 12 }
+          onStateChange(final)
+          return final
         }
       }
     }
@@ -187,17 +198,16 @@ export function gameLoop(
   // countdown timer
   s.timer = s.timer - dt
   if (s.timer <= 0) {
-    // wave complete
     const config = getLevelConfig(s.level)
     if (s.wave >= config.waves) {
-      // level complete
       const options = pickUpgradeOptions(s.upgrades)
-      onStateChange({ ...s, gameState: 'UPGRADE', upgradeOptions: options, upgradeInput: '' })
-      return { ...s, gameState: 'UPGRADE', upgradeOptions: options, upgradeInput: '' }
+      const next = { ...s, gameState: 'UPGRADE' as const, upgradeOptions: options, upgradeInput: '', pendingEvents: [...s.pendingEvents, 'upgrade'] as SoundEvent[] }
+      onStateChange(next)
+      return next
     } else {
       const nextWave = s.wave + 1
       const nextSchedule = buildSpawnSchedule(config, nextWave)
-      s = { ...s, wave: nextWave, timer: config.duration + s.timeBonusSeconds, enemies: [], spawnQueue: nextSchedule, nextSpawnTime: 0, inputBuffer: '', activeEnemyId: null }
+      s = { ...s, wave: nextWave, timer: config.duration + s.timeBonusSeconds, enemies: [], spawnQueue: nextSchedule, nextSpawnTime: 0, inputBuffer: '', activeEnemyId: null, waveEnemyTotal: nextSchedule.length }
       onStateChange({ ...s, gameState: 'WAVE_CLEAR' })
       return { ...s, gameState: 'WAVE_CLEAR' }
     }
@@ -232,7 +242,29 @@ export function handleKeyInput(state: GameEngineState, key: string): GameEngineS
 
   if (key === 'Escape') return { ...state, gameState: 'PAUSED' }
 
-  let s = { ...state }
+  // area bomb trigger
+  if (key === 'Tab' && state.upgrades.includes('area_bomb') && areaBombTimer <= 0) {
+    areaBombTimer = 30
+    let s = { ...state, areaBombCooldown: 30, pendingEvents: [...state.pendingEvents, 'area_bomb'] as SoundEvent[], pendingShake: Math.max(state.pendingShake, 6) }
+    const BOMB_RADIUS = 220
+    s.enemies = s.enemies.map(e => {
+      if (e.dead) return e
+      const dist = Math.hypot(e.x - CENTER_X, e.y - CENTER_Y)
+      if (dist <= BOMB_RADIUS) {
+        const newHp = e.hp - 1
+        if (newHp <= 0) {
+          s.particles = [...s.particles, ...createExplosion(e.x, e.y, e.glowColor, 14)]
+          return { ...e, dead: true }
+        }
+        return { ...e, hp: newHp }
+      }
+      return e
+    })
+    s.particles = [...s.particles, ...createExplosion(CENTER_X, CENTER_Y, '#f97316aa', 32)]
+    return s
+  }
+
+  let s = { ...state, pendingEvents: EMPTY_EVENTS }
 
   if (key === 'Backspace') {
     s.inputBuffer = s.inputBuffer.slice(0, -1)
@@ -244,15 +276,15 @@ export function handleKeyInput(state: GameEngineState, key: string): GameEngineS
 
   const newBuffer = s.inputBuffer + key.toLowerCase()
 
-  // find matching enemy
   const living = s.enemies.filter(e => !e.dead)
 
-  // if locked on active, check it first
+  // locked on active enemy
   if (s.activeEnemyId !== null) {
     const target = living.find(e => e.id === s.activeEnemyId)
     if (target) {
       const newTyped = target.typed + key.toLowerCase()
       if (matchesPrefix(target.target, newTyped)) {
+        s.pendingEvents = ['keystroke']
         if (isComplete(target.target, newTyped)) {
           return killEnemy(s, target.id)
         }
@@ -260,8 +292,10 @@ export function handleKeyInput(state: GameEngineState, key: string): GameEngineS
         s.inputBuffer = newBuffer
         return s
       } else {
-        // mistake — reset typed but keep lock
+        // mistake
+        s.pendingEvents = ['error']
         s.combo = 0
+        s.scoreSurgeStreak = 0
         s.critStreakCount = 0
         s.enemies = s.enemies.map(e => e.id === target.id ? { ...e, typed: '' } : e)
         s.inputBuffer = ''
@@ -271,10 +305,11 @@ export function handleKeyInput(state: GameEngineState, key: string): GameEngineS
     }
   }
 
-  // try to acquire new target
+  // acquire new target
   for (const e of living) {
     const testTyped = key.toLowerCase()
     if (matchesPrefix(e.target, testTyped)) {
+      s.pendingEvents = ['keystroke']
       if (isComplete(e.target, testTyped)) {
         return killEnemy({ ...s, inputBuffer: '' }, e.id)
       }
@@ -285,8 +320,10 @@ export function handleKeyInput(state: GameEngineState, key: string): GameEngineS
     }
   }
 
-  // no match — wrong key, reset combo
+  // no match
+  s.pendingEvents = ['error']
   s.combo = 0
+  s.scoreSurgeStreak = 0
   s.critStreakCount = 0
   return s
 }
@@ -313,12 +350,18 @@ function killEnemy(state: GameEngineState, enemyId: number): GameEngineState {
     const result = fireTurret(s.turret, enemy.x, enemy.y, s.combo)
     s.turret = result.turret
     s.projectiles = [...s.projectiles, result.projectile]
+    s.pendingEvents = [...s.pendingEvents, 'keystroke']
     return s
   }
 
-  // kill
+  // kill confirmed
   s.enemies = s.enemies.map(e => e.id === enemyId ? { ...e, dead: true } : e)
   s.particles = [...s.particles, ...createExplosion(enemy.x, enemy.y, enemy.glowColor, isCrit ? 24 : 14)]
+
+  // sound & shake for boss kill
+  const killSound: SoundEvent = enemy.type === 'boss' ? 'kill_boss' : 'kill'
+  s.pendingEvents = [...s.pendingEvents, killSound]
+  if (enemy.type === 'boss') s.pendingShake = Math.max(s.pendingShake, 8)
 
   // chain explosion
   if (s.chainExplosion) {
@@ -337,12 +380,49 @@ function killEnemy(state: GameEngineState, enemyId: number): GameEngineState {
     })
   }
 
+  // word_freeze: 30% chance to freeze nearby enemies
+  if (s.upgrades.includes('word_freeze')) {
+    if (Math.random() < 0.3) {
+      s.enemies = s.enemies.map(e => {
+        if (e.dead || e.id === enemyId) return e
+        const dist = Math.hypot(e.x - enemy.x, e.y - enemy.y)
+        if (dist <= 100) return { ...e, frozen: true, frozenTimer: 1.5 }
+        return e
+      })
+      s.pendingEvents = [...s.pendingEvents, 'freeze']
+    }
+  }
+
+  // scoring: combo milestone sounds
+  const prevCombo = s.combo
+  s.combo = prevCombo + 1
+  s.maxCombo = Math.max(s.maxCombo, s.combo)
+
+  if (s.combo === 5) s.pendingEvents = [...s.pendingEvents, 'combo5']
+  else if (s.combo === 10) s.pendingEvents = [...s.pendingEvents, 'combo10']
+  else if (s.combo === 20) s.pendingEvents = [...s.pendingEvents, 'combo20']
+
+  // score: improved combo multiplier
   const pointsPerType: Record<string, number> = { infantry: 10, speeder: 15, tank: 25, elite: 40, boss: 100 }
   const basePoints = pointsPerType[enemy.type] ?? 10
-  const comboMult = 1 + Math.floor(s.combo / 10) * 0.2
-  s.score += Math.floor(basePoints * comboMult * (isCrit ? 3 : 1))
-  s.combo = s.combo + 1
-  s.maxCombo = Math.max(s.maxCombo, s.combo)
+  const comboMult = s.combo >= 20 ? 3 : s.combo >= 10 ? 2 : s.combo >= 5 ? 1.5 : 1
+
+  // score_surge: track and apply
+  let surgeMult = 1
+  if (s.upgrades.includes('score_surge')) {
+    s.scoreSurgeStreak = (s.scoreSurgeStreak ?? 0) + 1
+    if (s.scoreSurgeKills > 0) {
+      surgeMult = 3
+      s.scoreSurgeKills -= 1
+    } else if (s.scoreSurgeStreak >= 8) {
+      s.scoreSurgeKills = 5
+      s.scoreSurgeStreak = 0
+      surgeMult = 3
+      s.scoreSurgeKills -= 1
+    }
+  }
+
+  s.score += Math.floor(basePoints * comboMult * surgeMult * (isCrit ? 3 : 1))
 
   const result = fireTurret(s.turret, enemy.x, enemy.y, s.combo)
   s.turret = result.turret
@@ -351,10 +431,9 @@ function killEnemy(state: GameEngineState, enemyId: number): GameEngineState {
   s.inputBuffer = ''
   s.activeEnemyId = null
 
-  // check if all enemies cleared and spawn queue empty
+  // bonus score if wave cleared early
   const stillLiving = s.enemies.filter(e => !e.dead)
   if (stillLiving.length === 0 && s.spawnQueue.length === 0 && s.timer > 0) {
-    // bonus time remaining as score
     s.score += Math.floor(s.timer) * 5
   }
 
@@ -393,12 +472,14 @@ function applyUpgrade(state: GameEngineState, idx: number): GameEngineState {
   const config = getLevelConfig(nextLevel)
 
   if (nextLevel > 10) {
-    return { ...s, upgrades: newUpgrades, gameState: 'VICTORY' }
+    return { ...s, upgrades: newUpgrades, gameState: 'VICTORY', pendingEvents: ['victory'] }
   }
 
   resetWordSystem()
   autoTurretTimer = 10
+  areaBombTimer = 0
 
+  const schedule = buildSpawnSchedule(config, 1)
   const nextS: GameEngineState = {
     ...s,
     upgrades: newUpgrades,
@@ -409,7 +490,7 @@ function applyUpgrade(state: GameEngineState, idx: number): GameEngineState {
     enemies: [],
     projectiles: [],
     particles: [],
-    spawnQueue: buildSpawnSchedule(config, 1),
+    spawnQueue: schedule,
     nextSpawnTime: 0,
     inputBuffer: '',
     activeEnemyId: null,
@@ -417,6 +498,9 @@ function applyUpgrade(state: GameEngineState, idx: number): GameEngineState {
     upgradeInput: '',
     upgradeOptions: [],
     gameState: 'PLAYING',
+    waveEnemyTotal: schedule.length,
+    pendingEvents: EMPTY_EVENTS,
+    pendingShake: 0,
   }
   return nextS
 }

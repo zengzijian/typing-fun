@@ -7,6 +7,7 @@ import { TypingResults, type TypingEvent } from '@/components/TypingResults'
 import { useTheme } from '@/hooks/useTheme'
 import { ThemeSelector } from '@/components/ThemeSelector'
 import { IdeCamouflage, pickFakeFile } from '@/components/IdeCamouflage'
+import { useTranslation } from 'react-i18next'
 
 type WordStatus = 'pending' | 'correct' | 'error'
 type TypingMode = 'chinese' | 'english'
@@ -52,20 +53,32 @@ function spreadSingleCharWords(words: GameWord[]): GameWord[] {
   return result
 }
 
-const SINGLE_CHAR_RATIO = 0.15
+const SINGLE_CHAR_RATIO = 0.1
+
+function samplePool<T>(pool: T[], n: number): T[] {
+  const result: T[] = []
+  while (result.length < n) {
+    result.push(...shuffleArray(pool).slice(0, n - result.length))
+  }
+  return result
+}
 
 function sampleChineseWords(total: number): GameWord[] {
-  const shuffled = shuffleArray(wordList)
-  const maxSingles = Math.floor(total * SINGLE_CHAR_RATIO)
-  const singles = shuffled
-    .filter((e) => e.chinese.length === 1)
-    .slice(0, maxSingles)
-    .map((e) => ({ display: e.chinese, target: e.pinyin }))
-  const multis = shuffled
-    .filter((e) => e.chinese.length > 1)
-    .slice(0, total - singles.length)
-    .map((e) => ({ display: e.chinese, target: e.pinyin }))
-  return spreadSingleCharWords([...singles, ...multis])
+  const allSingles = wordList.filter((e) => e.chinese.length === 1)
+  const allDoubles = wordList.filter((e) => e.chinese.length === 2)
+  const allTriples = wordList.filter((e) => e.chinese.length === 3)
+
+  const nSingles = Math.floor(total * SINGLE_CHAR_RATIO)
+  const nMulti = total - nSingles
+  // 2-char : 3-char = 7 : 3
+  const nDoubles = Math.round(nMulti * 7 / 10)
+  const nTriples = nMulti - nDoubles
+
+  const singles = samplePool(allSingles, nSingles).map((e) => ({ display: e.chinese, target: e.pinyin }))
+  const doubles = samplePool(allDoubles, nDoubles).map((e) => ({ display: e.chinese, target: e.pinyin }))
+  const triples = samplePool(allTriples, nTriples).map((e) => ({ display: e.chinese, target: e.pinyin }))
+
+  return spreadSingleCharWords([...singles, ...shuffleArray([...doubles, ...triples])])
 }
 
 const INITIAL_WORD_COUNT = 200
@@ -92,6 +105,7 @@ function appendGameWords(mode: TypingMode): GameWord[] {
 }
 
 function Typing() {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<TypingMode>('chinese')
   const [words, setWords] = useState<GameWord[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -102,13 +116,21 @@ function Typing() {
   const [isCamouflage, setIsCamouflage] = useState(() =>
     localStorage.getItem('typing-fun-camouflage') === 'true'
   )
+  const [camouflageIsDark, setCamouflageIsDark] = useState(() =>
+    localStorage.getItem('typing-fun-camouflage-dark') !== 'false'
+  )
+  const [isFocusMode, setIsFocusMode] = useState(() =>
+    localStorage.getItem('typing-fun-focus') === 'true'
+  )
+  const [gameKey, setGameKey] = useState(0)
   const [activeFile, setActiveFile] = useState(pickFakeFile)
   const [timeLeft, setTimeLeft] = useState(60)
   const [isActive, setIsActive] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [wpm, setWpm] = useState(0)
-  const { themeId, setThemeId, themes } = useTheme(isCamouflage ? 'one-dark' : undefined)
+  const camouflageThemeId = camouflageIsDark ? 'one-dark' : 'vscode-light'
+  const { themeId, setThemeId, themes } = useTheme(isCamouflage ? camouflageThemeId : undefined)
 
   const currentWordRef = useRef<HTMLDivElement>(null)
   const typingEventsRef = useRef<TypingEvent[]>([])
@@ -117,8 +139,12 @@ function Typing() {
   const wordsContainerRef = useRef<HTMLDivElement>(null)
   const wordsScrollRef = useRef<HTMLDivElement>(null)
   const prevCursorTopRef = useRef<number | null>(null)
+  const tabActiveRef = useRef(false)
+  const focusTopOverlayRef = useRef<HTMLDivElement>(null)
+  const focusBottomOverlayRef = useRef<HTMLDivElement>(null)
 
   const initGame = (limit: number, nextMode: TypingMode = mode) => {
+    setGameKey((k) => k + 1)
     setWords(toGameWords(nextMode))
     setStatuses(new Array(INITIAL_WORD_COUNT).fill('pending'))
     setCompletedInputs([])
@@ -177,7 +203,7 @@ function Typing() {
 
       if (e.key === 'Tab') {
         e.preventDefault()
-        initGame(timeLimit)
+        tabActiveRef.current = true
         return
       }
 
@@ -190,6 +216,24 @@ function Typing() {
         })
         return
       }
+
+      if (e.key === 'F2') {
+        e.preventDefault()
+        setIsFocusMode((prev) => {
+          const next = !prev
+          localStorage.setItem('typing-fun-focus', String(next))
+          return next
+        })
+        return
+      }
+
+      if (e.key === 'Enter' && tabActiveRef.current) {
+        tabActiveRef.current = false
+        initGame(timeLimit)
+        return
+      }
+
+      tabActiveRef.current = false
 
       if (!isActive && /^[a-z]$/.test(e.key)) {
         setIsActive(true)
@@ -258,6 +302,7 @@ function Typing() {
     timeLimit,
     mode,
     isCamouflage,
+    isFocusMode,
   ])
 
   useEffect(() => {
@@ -298,8 +343,21 @@ function Typing() {
       // scrolls exactly one rowHeight per row after that, keeping row(N-2) just off-screen.
       const targetScrollTop = Math.max(0, wordEl.offsetTop - paddingTop - rowHeight)
       wordsScrollRef.current.scrollTop = targetScrollTop
+
+      if (isFocusMode) {
+        const scrollContainer = wordsScrollRef.current
+        const wordRect = wordEl.getBoundingClientRect()
+        const containerRect = scrollContainer.getBoundingClientRect()
+        const rowVisualTop = wordRect.top - containerRect.top
+        if (focusTopOverlayRef.current) {
+          focusTopOverlayRef.current.style.height = `${Math.max(0, rowVisualTop)}px`
+        }
+        if (focusBottomOverlayRef.current) {
+          focusBottomOverlayRef.current.style.top = `${rowVisualTop + wordRect.height}px`
+        }
+      }
     }
-  }, [currentInput, currentIndex, isCamouflage])
+  }, [currentInput, currentIndex, isCamouflage, isFocusMode, gameKey])
 
   const handleTimeChange = (newTime: number) => {
     initGame(newTime)
@@ -357,11 +415,20 @@ function Typing() {
         const isPending = status === 'pending' && !isCurrent
         const isCorrect = status === 'correct'
 
+        const focusAheadDiff = isFocusMode ? index - currentIndex : 0
+        const focusOpacity =
+          focusAheadDiff <= 0 ? undefined
+          : focusAheadDiff === 1 ? 0.55
+          : focusAheadDiff === 2 ? 0.28
+          : focusAheadDiff === 3 ? 0.1
+          : 0
+
         return (
           <div
             key={`${word.display}-${index}`}
             ref={isCurrent ? currentWordRef : null}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-1 transition-opacity duration-150"
+            style={focusOpacity !== undefined ? { opacity: focusOpacity } : undefined}
           >
             {mode === 'chinese' && (
               <div
@@ -489,7 +556,6 @@ function Typing() {
       wpm={wpm}
       correctCount={correctCount}
       totalCount={currentIndex}
-      mode={mode}
       onRetry={() => initGame(timeLimit)}
     />
   )
@@ -497,9 +563,38 @@ function Typing() {
   if (isCamouflage) {
     return (
       <div className="fixed inset-0 bg-background text-foreground z-50">
-        <IdeCamouflage timeLeft={timeLeft} wpm={wpm} activeFile={activeFile}>
-          <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
-            {wordsContainer}
+        <IdeCamouflage
+          timeLeft={timeLeft}
+          wpm={wpm}
+          activeFile={activeFile}
+          isDark={camouflageIsDark}
+          onThemeToggle={() => setCamouflageIsDark((prev) => {
+            const next = !prev
+            localStorage.setItem('typing-fun-camouflage-dark', String(next))
+            return next
+          })}
+          typingMode={mode}
+          onTypingModeToggle={() => handleModeChange(mode === 'chinese' ? 'english' : 'chinese')}
+          timeLimit={timeLimit}
+          onTimeLimitChange={handleTimeChange}
+          timeOptions={TIME_OPTIONS}
+          isFocusMode={isFocusMode}
+          onFocusToggle={() => setIsFocusMode((prev) => {
+            const next = !prev
+            localStorage.setItem('typing-fun-focus', String(next))
+            return next
+          })}
+        >
+          <div className="relative">
+            <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
+              {wordsContainer}
+            </div>
+            {isFocusMode && (
+              <>
+                <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
+                <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+              </>
+            )}
           </div>
         </IdeCamouflage>
         {resultsPanel}
@@ -512,7 +607,7 @@ function Typing() {
       <div className="w-full max-w-6xl flex flex-col flex-1">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-primary">
-            Looks like work. Feels like play.
+            {t('typing.slogan')}
           </h1>
         </header>
 
@@ -520,6 +615,12 @@ function Typing() {
           <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
             {wordsContainer}
           </div>
+          {isFocusMode && (
+            <>
+              <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
+              <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+            </>
+          )}
         </div>
 
         <div className="flex items-center justify-between px-6">
@@ -546,8 +647,8 @@ function Typing() {
             onChange={(e) => handleModeChange(e.target.value as TypingMode)}
             className="bg-card border border-border rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:border-foreground/40 focus:outline-none focus:border-primary cursor-pointer transition-colors"
           >
-            <option value="chinese">中文拼音</option>
-            <option value="english">English</option>
+            <option value="chinese">{t('typing.modeZh')}</option>
+            <option value="english">{t('typing.modeEn')}</option>
           </select>
 
           <div className="flex gap-2">
@@ -567,11 +668,28 @@ function Typing() {
             ))}
           </div>
 
-          <ThemeSelector
-            themeId={themeId}
-            themes={themes}
-            onThemeChange={setThemeId}
-          />
+          <div className="flex items-center gap-2">
+            <ThemeSelector
+              themeId={themeId}
+              themes={themes}
+              onThemeChange={setThemeId}
+            />
+            <button
+              onClick={() => setIsFocusMode((prev) => {
+                const next = !prev
+                localStorage.setItem('typing-fun-focus', String(next))
+                return next
+              })}
+              title={isFocusMode ? t('typing.focusExit') : t('typing.focusEnter')}
+              className={`flex items-center px-2.5 py-1.5 rounded-md border text-sm transition-colors ${
+                isFocusMode
+                  ? 'border-primary text-primary'
+                  : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground/40'
+              }`}
+            >
+              <i className={isFocusMode ? 'ri-focus-3-fill' : 'ri-focus-3-line'} />
+            </button>
+          </div>
         </div>
 
         {resultsPanel}

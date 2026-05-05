@@ -23,6 +23,10 @@ Thumbs.db
 # Playwright MCP
 .playwright-mcp/
 
+# Documentation (local only, not tracked)
+GAME_ANALYSIS.md
+docs/
+
 # Logs
 *.log
 npm-debug.log*

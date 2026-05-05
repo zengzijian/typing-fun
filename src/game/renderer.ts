@@ -67,6 +67,53 @@ export function drawHUD(ctx: CanvasRenderingContext2D, state: GameEngineState) {
   ctx.fillText(`LEVEL ${level}`, 16, 30)
   ctx.fillText(`WAVE ${wave} / ${totalWaves}`, 16, 48)
 
+  // wave progress bar (top-left, below wave text)
+  const total = state.waveEnemyTotal || 1
+  const killed = total - (state.enemies.filter(e => !e.dead).length + state.spawnQueue.length)
+  const progress = Math.max(0, Math.min(1, killed / total))
+  const barW = 90
+  const barH = 5
+  const barX = 16
+  const barY = 57
+  ctx.fillStyle = '#1e293b'
+  ctx.fillRect(barX, barY, barW, barH)
+  ctx.fillStyle = progress >= 1 ? '#22c55e' : '#00e5ff'
+  ctx.shadowBlur = 4
+  ctx.shadowColor = progress >= 1 ? '#22c55e' : '#00e5ff'
+  ctx.fillRect(barX, barY, barW * progress, barH)
+  ctx.shadowBlur = 0
+  ctx.font = '10px "Courier New", monospace'
+  ctx.fillStyle = '#475569'
+  ctx.fillText(`${killed}/${total}`, barX + barW + 6, barY + 5)
+
+  // area bomb cooldown (bottom-left)
+  if (state.upgrades.includes('area_bomb')) {
+    const cd = state.areaBombCooldown ?? 0
+    const ready = cd <= 0
+    ctx.font = 'bold 11px "Courier New", monospace'
+    ctx.fillStyle = ready ? '#f97316' : '#475569'
+    ctx.textAlign = 'left'
+    if (ready) {
+      ctx.shadowBlur = 8
+      ctx.shadowColor = '#f97316'
+      ctx.fillText('[TAB] BOMB ●', 16, CANVAS_HEIGHT - 20)
+    } else {
+      ctx.fillText(`[TAB] BOMB ${Math.ceil(cd)}s`, 16, CANVAS_HEIGHT - 20)
+    }
+    ctx.shadowBlur = 0
+  }
+
+  // score surge indicator (bottom-left area)
+  if (state.upgrades.includes('score_surge') && state.scoreSurgeKills > 0) {
+    ctx.font = 'bold 11px "Courier New", monospace'
+    ctx.fillStyle = '#fbbf24'
+    ctx.shadowBlur = 8
+    ctx.shadowColor = '#fbbf24'
+    ctx.textAlign = 'left'
+    ctx.fillText(`SURGE ×3 ×${state.scoreSurgeKills}`, 16, CANVAS_HEIGHT - 36)
+    ctx.shadowBlur = 0
+  }
+
   // top-center: timer
   const mins = Math.floor(timer / 60)
   const secs = Math.floor(timer % 60)
