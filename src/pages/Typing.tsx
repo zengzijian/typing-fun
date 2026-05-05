@@ -292,8 +292,11 @@ function Typing() {
       const wordEl = currentWordRef.current
       const gap = isCamouflage ? 8 : 24 // gap-2 : gap-6
       const rowHeight = wordEl.offsetHeight + gap
-      wordsScrollRef.current.style.height = `${rowHeight * 4}px`
-      const targetScrollTop = Math.max(0, wordEl.offsetTop - rowHeight)
+      const paddingTop = parseFloat(getComputedStyle(container).paddingTop)
+      // paddingTop always equals gap (pt-6==gap-6 for normal; pt-2==gap-2 for camouflage),
+      // so max(0, offsetTop - paddingTop - rowHeight) naturally yields 0 for rows 1-2 and
+      // scrolls exactly one rowHeight per row after that, keeping row(N-2) just off-screen.
+      const targetScrollTop = Math.max(0, wordEl.offsetTop - paddingTop - rowHeight)
       wordsScrollRef.current.scrollTop = targetScrollTop
     }
   }, [currentInput, currentIndex, isCamouflage])
@@ -328,8 +331,20 @@ function Typing() {
         doneError:   'text-destructive/60',
       }
 
+  // Exact height = p-6 top-padding (1.5rem) + 4×wordHeight + 3×rowGap
+  // Normal modes: gap-6 == p-6 == 1.5rem → p6 + 4×(wh+gap) − gap = 4×rowHeight (gap cancels)
+  // Camouflage:   gap-2 = 0.5rem ≠ p-6 = 1.5rem → need +1rem vs the naive ×4 formula
+  // Height = pt + 4×wordHeight + 3×gap  (pt == gap in every mode, so = 4×rowHeight)
+  // Normal English:     4×(2.25+1.5)rem = 15rem
+  // Normal Chinese:     4×(4.5 +1.5)rem = 24rem
+  // Camouflage English: 4×(1.25+0.5)rem =  7rem
+  // Camouflage Chinese: 4×(2.5 +0.5)rem = 12rem
+  const scrollHeightCls = isCamouflage
+    ? (mode === 'chinese' ? 'h-[12rem]' : 'h-[7rem]')
+    : (mode === 'chinese' ? 'h-[24rem]' : 'h-[15rem]')
+
   const wordsContainer = (
-    <div ref={wordsContainerRef} className={`relative flex flex-wrap p-6 ${isCamouflage ? 'gap-2' : 'gap-6'}`}>
+    <div ref={wordsContainerRef} className={`relative flex flex-wrap px-6 pb-6 ${isCamouflage ? 'pt-2 gap-2' : 'pt-6 gap-6'}`}>
       <div
         ref={cursorDivRef}
         className="absolute pointer-events-none w-[2px] bg-primary"
@@ -483,7 +498,7 @@ function Typing() {
     return (
       <div className="fixed inset-0 bg-background text-foreground z-50">
         <IdeCamouflage timeLeft={timeLeft} wpm={wpm} activeFile={activeFile}>
-          <div ref={wordsScrollRef} className="overflow-hidden">
+          <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
             {wordsContainer}
           </div>
         </IdeCamouflage>
@@ -493,24 +508,21 @@ function Typing() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center px-4 py-8">
-      <div className="w-full max-w-6xl">
+    <div className="fixed inset-x-0 bottom-0 top-14 bg-background text-foreground flex flex-col items-center px-4 py-8">
+      <div className="w-full max-w-6xl flex flex-col flex-1">
         <header className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-primary mb-2">
-            {mode === 'chinese' ? '中文打字练习' : 'English Typing'}
+          <h1 className="text-5xl font-bold text-primary">
+            Looks like work. Feels like play.
           </h1>
-          <p className="text-muted-foreground text-lg">
-            an elegant typing experience, just start typing
-          </p>
         </header>
 
-        <div className="relative mb-8">
-          <div ref={wordsScrollRef} className="overflow-hidden">
+        <div className="relative flex-1">
+          <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
             {wordsContainer}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-8 px-6">
+        <div className="flex items-center justify-between px-6">
           <div className="text-4xl font-bold text-primary">
             {timeLeft}s
           </div>
