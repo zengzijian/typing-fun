@@ -13,8 +13,8 @@ function App() {
         <Navigation />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Navigate to="/typing" replace />} />
-            <Route path="/typing" element={<Typing />} />
+            <Route path="/" element={<Typing />} />
+            <Route path="/typing" element={<Navigate to="/" replace />} />
             <Route path="/models" element={<Models />} />
             <Route path="/model/detail" element={<ModelDetail />} />
             <Route path="/mech-game" element={<MechGame />} />
