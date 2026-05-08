@@ -2,7 +2,8 @@
   "nav": {
     "typing": "Typing",
     "mechGame": "Mech Game",
-    "models": "Models"
+    "models": "Models",
+    "leaderboard": "Leaderboard"
   },
   "lang": {
     "zh": "简",
@@ -26,7 +27,30 @@
     "correct": "Correct",
     "chart": "WPM over time",
     "errors": "Errors",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "submitBtn": "Submit Score"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "submitTitle": "Submit Score",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "view": "View Leaderboard",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "Enter your nickname (max 20 chars)",
+    "submitSuccess": "Score submitted!",
+    "rank": "You ranked #{{rank}}",
+    "timeLimit": "Time",
+    "modeLabel": "Mode",
+    "player": "Player",
+    "date": "Date",
+    "loading": "Loading...",
+    "empty": "No scores yet — be the first!",
+    "error": "Submission failed, please try again",
+    "submitAs": "Submit as {{nickname}}",
+    "changeNickname": "Change"
   },
   "models": {
     "title": "Models",

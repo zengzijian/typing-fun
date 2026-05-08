@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Keyboard, Box, Crosshair } from "lucide-react";
+import { Keyboard, Box, Crosshair, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const LANGS = ["en", "zh-CN", "zh-HK"] as const;
@@ -37,6 +37,7 @@ const Navigation = () => {
     { path: "/", label: t("nav.typing"), icon: Keyboard },
     { path: "/mech-game", label: t("nav.mechGame"), icon: Crosshair },
     { path: "/models", label: t("nav.models"), icon: Box },
+    { path: "/leaderboard", label: t("nav.leaderboard"), icon: Trophy },
   ];
 
   return (

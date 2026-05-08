@@ -21,9 +21,10 @@ interface Props {
   timeLimit?: number
   onTimeLimitChange?: (t: number) => void
   timeOptions?: readonly number[]
+  isTerminal?: boolean
 }
 
-export function IdeCamouflage({ timeLeft, wpm, activeFile, children, isDark = true, onThemeToggle, isFocusMode, onFocusToggle, typingMode = 'chinese', onTypingModeToggle, timeLimit, onTimeLimitChange, timeOptions }: Props) {
+export function IdeCamouflage({ timeLeft, wpm, activeFile, children, isDark = true, onThemeToggle, isFocusMode, onFocusToggle, typingMode = 'chinese', onTypingModeToggle, timeLimit, onTimeLimitChange, timeOptions, isTerminal = false }: Props) {
   const { t } = useTranslation()
   const tabs = [activeFile, ...FAKE_FILES.filter((f) => f !== activeFile).slice(0, 2)]
   const lang = activeFile.endsWith('.py') ? 'Python' : activeFile.endsWith('.tsx') ? 'TSX' : 'TypeScript'
@@ -83,17 +84,19 @@ export function IdeCamouflage({ timeLeft, wpm, activeFile, children, isDark = tr
 
       {/* Editor area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Line numbers */}
-        <div className="flex flex-col items-end pt-2 px-3 text-muted-foreground/25 text-sm font-mono select-none bg-background border-r border-border/20 shrink-0 w-12">
-          {typingMode === 'chinese'
-            ? Array.from({ length: 60 }, (_, i) => (
-                <span key={i} className="leading-6">{i + 1}</span>
-              ))
-            : Array.from({ length: 30 }, (_, i) => (
-                <span key={i} className="leading-loose">{i + 1}</span>
-              ))
-          }
-        </div>
+        {/* Line numbers — hidden in terminal mode */}
+        {!isTerminal && (
+          <div className="flex flex-col items-end pt-2 px-3 text-muted-foreground/25 text-sm font-mono select-none bg-background border-r border-border/20 shrink-0 w-12">
+            {typingMode === 'chinese'
+              ? Array.from({ length: 60 }, (_, i) => (
+                  <span key={i} className="leading-6">{i + 1}</span>
+                ))
+              : Array.from({ length: 30 }, (_, i) => (
+                  <span key={i} className="leading-loose">{i + 1}</span>
+                ))
+            }
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-hidden">{children}</div>

@@ -4,10 +4,12 @@ import { englishWordList } from '@/data/englishWords'
 import { Button } from '@/components/ui/button'
 import { RotateCcw } from 'lucide-react'
 import { TypingResults, type TypingEvent } from '@/components/TypingResults'
+import { IdeTerminalResults } from '@/components/IdeTerminalResults'
 import { useTheme } from '@/hooks/useTheme'
 import { ThemeSelector } from '@/components/ThemeSelector'
 import { IdeCamouflage, pickFakeFile } from '@/components/IdeCamouflage'
 import { useTranslation } from 'react-i18next'
+import { ShortcutHelp } from '@/components/ShortcutHelp'
 
 type WordStatus = 'pending' | 'correct' | 'error'
 type TypingMode = 'chinese' | 'english'
@@ -112,7 +114,11 @@ function Typing() {
   const [currentInput, setCurrentInput] = useState('')
   const [statuses, setStatuses] = useState<WordStatus[]>([])
   const [completedInputs, setCompletedInputs] = useState<string[]>([])
-  const [timeLimit, setTimeLimit] = useState<number>(60)
+  const [timeLimit, setTimeLimit] = useState<number>(() => {
+    const stored = localStorage.getItem('typing-fun-time-limit')
+    const parsed = stored ? parseInt(stored, 10) : NaN
+    return (TIME_OPTIONS as readonly number[]).includes(parsed) ? parsed : 60
+  })
   const [isCamouflage, setIsCamouflage] = useState(() =>
     localStorage.getItem('typing-fun-camouflage') === 'true'
   )
@@ -168,7 +174,7 @@ function Typing() {
   }
 
   useEffect(() => {
-    initGame(60)
+    initGame(timeLimit)
   }, [])
 
   useEffect(() => {
@@ -199,13 +205,24 @@ function Typing() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isComplete) return
-
       if (e.key === 'Tab') {
         e.preventDefault()
         tabActiveRef.current = true
         return
       }
+
+      if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        return
+      }
+
+      if (e.key === 'Enter' && tabActiveRef.current) {
+        tabActiveRef.current = false
+        initGame(timeLimit)
+        return
+      }
+
+      if (isComplete) return
 
       if (e.key === 'F1' || (e.ctrlKey && e.key === '\\')) {
         e.preventDefault()
@@ -227,15 +244,9 @@ function Typing() {
         return
       }
 
-      if (e.key === 'Enter' && tabActiveRef.current) {
-        tabActiveRef.current = false
-        initGame(timeLimit)
-        return
-      }
-
       tabActiveRef.current = false
 
-      if (!isActive && /^[a-z]$/.test(e.key)) {
+      if (!isActive && e.key.length === 1) {
         setIsActive(true)
       }
 
@@ -286,7 +297,7 @@ function Typing() {
         return
       }
 
-      if (/^[a-z]$/.test(e.key)) {
+      if (e.key.length === 1) {
         setCurrentInput((prev) => prev + e.key)
       }
     }
@@ -360,6 +371,7 @@ function Typing() {
   }, [currentInput, currentIndex, isCamouflage, isFocusMode, gameKey])
 
   const handleTimeChange = (newTime: number) => {
+    localStorage.setItem('typing-fun-time-limit', String(newTime))
     initGame(newTime)
   }
 
@@ -556,17 +568,18 @@ function Typing() {
       wpm={wpm}
       correctCount={correctCount}
       totalCount={currentIndex}
+      mode={mode}
       onRetry={() => initGame(timeLimit)}
     />
   )
 
   if (isCamouflage) {
     return (
-      <div className="fixed inset-0 bg-background text-foreground z-50">
+      <div className="fixed inset-0 bg-background text-foreground z-[60]">
         <IdeCamouflage
           timeLeft={timeLeft}
           wpm={wpm}
-          activeFile={activeFile}
+          activeFile={isComplete ? 'output.log' : activeFile}
           isDark={camouflageIsDark}
           onThemeToggle={() => setCamouflageIsDark((prev) => {
             const next = !prev
@@ -584,26 +597,38 @@ function Typing() {
             localStorage.setItem('typing-fun-focus', String(next))
             return next
           })}
+          isTerminal={isComplete}
         >
-          <div className="relative">
-            <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
-              {wordsContainer}
+          {isComplete ? (
+            <IdeTerminalResults
+              events={typingEventsRef.current}
+              timeLimit={timeLimit}
+              wpm={wpm}
+              correctCount={correctCount}
+              totalCount={currentIndex}
+              mode={mode}
+              onRetry={() => initGame(timeLimit)}
+            />
+          ) : (
+            <div className="relative">
+              <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
+                {wordsContainer}
+              </div>
+              {isFocusMode && (
+                <>
+                  <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
+                  <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+                </>
+              )}
             </div>
-            {isFocusMode && (
-              <>
-                <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
-                <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
-              </>
-            )}
-          </div>
+          )}
         </IdeCamouflage>
-        {resultsPanel}
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 top-14 bg-background text-foreground flex flex-col items-center px-4 py-8">
+    <div className="fixed inset-x-0 bottom-0 top-14 bg-background text-foreground flex flex-col items-center px-4 py-8 select-none">
       <div className="w-full max-w-6xl flex flex-col flex-1">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-primary">
@@ -694,6 +719,7 @@ function Typing() {
 
         {resultsPanel}
       </div>
+      <ShortcutHelp />
     </div>
   )
 }
