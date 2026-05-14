@@ -10,7 +10,7 @@ interface Params {
   mode: 'chinese' | 'english'
 }
 
-export function useResultsPanel({ events, timeLimit, wpm, correctCount, totalCount }: Params) {
+export function useResultsPanel({ events, timeLimit, correctCount, totalCount }: Params) {
   const [showSubmit, setShowSubmit] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 

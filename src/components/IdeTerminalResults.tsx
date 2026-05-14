@@ -16,7 +16,7 @@ type Props = {
 }
 
 export function IdeTerminalResults({ events, timeLimit, wpm, correctCount, totalCount, mode, onRetry }: Props) {
-  const { t } = useTranslation()
+  useTranslation()
   const { accuracy, chartData, showSubmit, setShowSubmit, refreshKey, onSubmitSuccess } =
     useResultsPanel({ events, timeLimit, wpm, correctCount, totalCount, mode })
 

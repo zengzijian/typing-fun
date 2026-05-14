@@ -293,7 +293,24 @@ function Typing() {
       }
 
       if (e.key === 'Backspace') {
-        setCurrentInput((prev) => prev.slice(0, -1))
+        if (currentInput.length === 0 && currentIndex > 0 && statuses[currentIndex - 1] === 'error') {
+          const prevIndex = currentIndex - 1
+          const prevInput = completedInputs[prevIndex] ?? ''
+          setCurrentIndex(prevIndex)
+          setCurrentInput(prevInput)
+          setStatuses((prev) => {
+            const next = [...prev]
+            next[prevIndex] = 'pending'
+            return next
+          })
+          setCompletedInputs((prev) => {
+            const next = [...prev]
+            next[prevIndex] = ''
+            return next
+          })
+        } else {
+          setCurrentInput((prev) => prev.slice(0, -1))
+        }
         return
       }
 
