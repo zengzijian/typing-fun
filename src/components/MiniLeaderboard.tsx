@@ -9,6 +9,7 @@ interface Score {
   nickname: string
   wpm: number
   accuracy: number
+  created_at: string
 }
 
 interface Props {
@@ -30,7 +31,7 @@ export function MiniLeaderboard({ timeLimit, mode, refreshKey }: Props) {
     setLoading(true)
     supabase
       .from('typing_scores')
-      .select('id, user_id, nickname, wpm, accuracy')
+      .select('id, user_id, nickname, wpm, accuracy, created_at')
       .eq('time_limit', timeLimit)
       .eq('mode', mode)
       .order('wpm', { ascending: false })
@@ -57,6 +58,7 @@ export function MiniLeaderboard({ timeLimit, mode, refreshKey }: Props) {
             <th className="px-3 py-2 text-left">{t('leaderboard.player')}</th>
             <th className="px-3 py-2 text-right">WPM</th>
             <th className="px-3 py-2 text-right">{t('results.accuracy')}</th>
+            <th className="px-3 py-2 text-right">{t('leaderboard.date')}</th>
           </tr>
         </thead>
         <tbody>
@@ -74,6 +76,7 @@ export function MiniLeaderboard({ timeLimit, mode, refreshKey }: Props) {
                 </td>
                 <td className="px-3 py-2 text-right font-mono font-semibold text-primary">{score.wpm}</td>
                 <td className="px-3 py-2 text-right font-mono text-muted-foreground">{score.accuracy}%</td>
+                <td className="px-3 py-2 text-right font-mono text-muted-foreground">{new Date(score.created_at).toLocaleString()}</td>
               </tr>
             )
           })}

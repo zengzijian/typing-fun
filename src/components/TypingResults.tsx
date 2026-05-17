@@ -24,8 +24,8 @@ export function TypingResults({ events, timeLimit, wpm, correctCount, totalCount
     useResultsPanel({ events, timeLimit, wpm, correctCount, totalCount, mode })
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-lg p-8 w-full max-w-2xl">
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="p-8 w-full">
         <h2 className="text-3xl font-bold text-primary mb-6 text-center">{t('results.title')}</h2>
 
         <div className="grid grid-cols-3 gap-4 mb-8">

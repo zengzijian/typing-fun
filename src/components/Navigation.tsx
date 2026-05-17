@@ -37,15 +37,15 @@ const Navigation = () => {
     { path: "/", label: t("nav.typing"), icon: Keyboard },
     { path: "/mech-game", label: t("nav.mechGame"), icon: Crosshair },
     { path: "/models", label: t("nav.models"), icon: Box },
-    { path: "/leaderboard", label: t("nav.leaderboard"), icon: Trophy },
+    { path: "/ranking", label: t("nav.leaderboard"), icon: Trophy },
   ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-6">
-        <Link to="/" className="flex items-center gap-2 text-sm font-semibold text-foreground tracking-tight">
-          <img src="/T-icon.svg" alt="Typing Fun" className="h-5 w-5" />
-          Typing Fun
+      <div className="max-w-6xl mx-auto flex h-16 items-center justify-between px-6">
+        <Link to="/" className="flex items-center gap-2 text-base">
+          <img src="/favicon.png" alt="Typing Fun" className="h-12 w-12 rounded-sm object-cover" />
+          <span className="brand-typing">Typing</span>{' '}<span className="brand-fun">Fun</span>
         </Link>
 
         <div className="flex items-center gap-1">

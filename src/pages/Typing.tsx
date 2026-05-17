@@ -122,9 +122,6 @@ function Typing() {
   const [isCamouflage, setIsCamouflage] = useState(() =>
     localStorage.getItem('typing-fun-camouflage') === 'true'
   )
-  const [camouflageIsDark, setCamouflageIsDark] = useState(() =>
-    localStorage.getItem('typing-fun-camouflage-dark') !== 'false'
-  )
   const [isFocusMode, setIsFocusMode] = useState(() =>
     localStorage.getItem('typing-fun-focus') === 'true'
   )
@@ -135,8 +132,7 @@ function Typing() {
   const [isComplete, setIsComplete] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [wpm, setWpm] = useState(0)
-  const camouflageThemeId = camouflageIsDark ? 'one-dark' : 'vscode-light'
-  const { themeId, setThemeId, themes } = useTheme(isCamouflage ? camouflageThemeId : undefined)
+  const { themeId, setThemeId, themes } = useTheme()
 
   const currentWordRef = useRef<HTMLDivElement>(null)
   const typingEventsRef = useRef<TypingEvent[]>([])
@@ -222,8 +218,6 @@ function Typing() {
         return
       }
 
-      if (isComplete) return
-
       if (e.key === 'F1' || (e.ctrlKey && e.key === '\\')) {
         e.preventDefault()
         setIsCamouflage((prev) => {
@@ -233,6 +227,8 @@ function Typing() {
         })
         return
       }
+
+      if (isComplete) return
 
       if (e.key === 'F2') {
         e.preventDefault()
@@ -578,17 +574,22 @@ function Typing() {
     </div>
   )
 
-  const resultsPanel = isComplete && (
-    <TypingResults
-      events={typingEventsRef.current}
-      timeLimit={timeLimit}
-      wpm={wpm}
-      correctCount={correctCount}
-      totalCount={currentIndex}
-      mode={mode}
-      onRetry={() => initGame(timeLimit)}
-    />
-  )
+
+  if (isComplete && !isCamouflage) {
+    return (
+      <div className="fixed inset-x-0 bottom-0 top-16 bg-background text-foreground flex items-center justify-center p-4 overflow-y-auto">
+        <TypingResults
+          events={typingEventsRef.current}
+          timeLimit={timeLimit}
+          wpm={wpm}
+          correctCount={correctCount}
+          totalCount={currentIndex}
+          mode={mode}
+          onRetry={() => initGame(timeLimit)}
+        />
+      </div>
+    )
+  }
 
   if (isCamouflage) {
     return (
@@ -597,12 +598,12 @@ function Typing() {
           timeLeft={timeLeft}
           wpm={wpm}
           activeFile={isComplete ? 'output.log' : activeFile}
-          isDark={camouflageIsDark}
-          onThemeToggle={() => setCamouflageIsDark((prev) => {
-            const next = !prev
-            localStorage.setItem('typing-fun-camouflage-dark', String(next))
-            return next
-          })}
+          themeId={themeId}
+          onThemeChange={(id) => setThemeId(id)}
+          onExit={() => {
+            localStorage.setItem('typing-fun-camouflage', 'false')
+            setIsCamouflage(false)
+          }}
           typingMode={mode}
           onTypingModeToggle={() => handleModeChange(mode === 'chinese' ? 'english' : 'chinese')}
           timeLimit={timeLimit}
@@ -631,7 +632,7 @@ function Typing() {
               <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
                 {wordsContainer}
               </div>
-              {isFocusMode && (
+              {isFocusMode && !isComplete && (
                 <>
                   <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
                   <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
@@ -645,7 +646,7 @@ function Typing() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 top-14 bg-background text-foreground flex flex-col items-center px-4 py-8 select-none">
+    <div className="fixed inset-x-0 bottom-0 top-16 bg-background text-foreground flex flex-col items-center px-4 py-8 select-none">
       <div className="w-full max-w-6xl flex flex-col flex-1">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold text-primary">
@@ -653,16 +654,18 @@ function Typing() {
           </h1>
         </header>
 
-        <div className="relative flex-1">
-          <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
-            {wordsContainer}
+        <div className="flex-1 flex items-center -translate-y-[30px]">
+          <div className="relative w-full">
+            <div ref={wordsScrollRef} className={`overflow-hidden ${scrollHeightCls}`}>
+              {wordsContainer}
+            </div>
+            {isFocusMode && (
+              <>
+                <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
+                <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+              </>
+            )}
           </div>
-          {isFocusMode && (
-            <>
-              <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
-              <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
-            </>
-          )}
         </div>
 
         <div className="flex items-center justify-between px-6">
@@ -734,7 +737,6 @@ function Typing() {
           </div>
         </div>
 
-        {resultsPanel}
       </div>
       <ShortcutHelp />
     </div>

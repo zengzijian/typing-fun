@@ -464,6 +464,60 @@ export const themes: Theme[] = [
     },
   },
   {
+    id: 'github-light',
+    name: 'GitHub Light',
+    preview: '#0969da',
+    preview2: '#ffffff',
+    vars: {
+      background: '0 0% 100%',
+      foreground: '215 14% 16%',
+      card: '210 17% 97%',
+      'card-foreground': '215 14% 16%',
+      popover: '210 17% 97%',
+      'popover-foreground': '215 14% 16%',
+      primary: '212 92% 45%',
+      'primary-foreground': '0 0% 100%',
+      secondary: '210 17% 93%',
+      'secondary-foreground': '215 14% 16%',
+      muted: '210 14% 47%',
+      'muted-foreground': '215 8% 47%',
+      accent: '212 92% 45%',
+      'accent-foreground': '0 0% 100%',
+      destructive: '0 72% 51%',
+      'destructive-foreground': '0 0% 100%',
+      border: '213 13% 85%',
+      input: '213 13% 88%',
+      ring: '212 92% 45%',
+    },
+  },
+  {
+    id: 'solarized-light',
+    name: 'Solarized Light',
+    preview: '#2aa198',
+    preview2: '#fdf6e3',
+    vars: {
+      background: '44 87% 94%',
+      foreground: '199 13% 28%',
+      card: '44 55% 89%',
+      'card-foreground': '199 13% 28%',
+      popover: '44 55% 89%',
+      'popover-foreground': '199 13% 28%',
+      primary: '175 59% 40%',
+      'primary-foreground': '0 0% 100%',
+      secondary: '44 44% 85%',
+      'secondary-foreground': '199 13% 28%',
+      muted: '194 10% 51%',
+      'muted-foreground': '194 14% 40%',
+      accent: '175 59% 40%',
+      'accent-foreground': '0 0% 100%',
+      destructive: '1 71% 52%',
+      'destructive-foreground': '0 0% 100%',
+      border: '44 20% 82%',
+      input: '44 30% 88%',
+      ring: '175 59% 40%',
+    },
+  },
+  {
     id: 'vscode-light',
     name: 'VS Code Light',
     preview: '#007acc',
@@ -492,4 +546,26 @@ export const themes: Theme[] = [
   },
 ]
 
-export const defaultThemeId = 'amber'
+export const defaultThemeId = 'one-dark'
+
+const SHARED_THEME_IDS = [
+  'one-dark',
+  'tokyo-night',
+  'catppuccin',
+  'material-ocean',
+  'night-owl',
+  'nord',
+  'dracula',
+  'monokai',
+  'gruvbox',
+  'synthwave',
+  'horizon',
+  'vscode-light',
+  'github-light',
+  'solarized-light',
+] as const
+
+export const sharedThemes = themes.filter((t) => (SHARED_THEME_IDS as readonly string[]).includes(t.id))
+
+// kept for IdeCamouflage compatibility
+export const CAMOUFLAGE_THEMES = sharedThemes

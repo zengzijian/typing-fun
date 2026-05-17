@@ -86,7 +86,7 @@ export function SubmitScore({ wpm, accuracy, timeLimit, mode, onClose, onSuccess
               {t('leaderboard.rank', { rank })}
             </p>
             <div className="flex gap-3 justify-center">
-              <Link to="/leaderboard" onClick={onClose}>
+              <Link to="/ranking" onClick={onClose}>
                 <Button variant="outline" size="sm">{t('leaderboard.view')}</Button>
               </Link>
               <Button size="sm" onClick={onClose}>{t('leaderboard.close')}</Button>

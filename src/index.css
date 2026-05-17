@@ -45,3 +45,28 @@
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
+
+@keyframes brand-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fun-glow {
+  0%, 100% { text-shadow: 0 0 12px hsl(38 92% 50% / 0.5); }
+  50%       { text-shadow: 0 0 24px hsl(38 92% 50% / 0.85), 0 0 4px hsl(38 92% 70% / 0.4); }
+}
+
+.brand-typing {
+  font-family: 'IBM Plex Mono', monospace;
+  opacity: 0.55;
+  letter-spacing: 0.05em;
+  animation: brand-in 0.4s ease both;
+}
+
+.brand-fun {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  color: hsl(38 92% 50%);
+  animation: brand-in 0.4s 0.12s ease both, fun-glow 2.5s 0.6s ease-in-out infinite;
+}

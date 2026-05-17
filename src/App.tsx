@@ -21,7 +21,7 @@ function App() {
             <Route path="/models" element={<Models />} />
             <Route path="/model/detail" element={<ModelDetail />} />
             <Route path="/mech-game" element={<MechGame />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/ranking" element={<Leaderboard />} />
           </Routes>
         </main>
       </div>

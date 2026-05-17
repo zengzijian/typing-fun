@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 const TIME_OPTIONS = [15, 30, 60, 90] as const
 type TimeOption = (typeof TIME_OPTIONS)[number]
+type Mode = 'chinese' | 'english'
 
 interface Score {
   id: string
@@ -17,11 +18,17 @@ interface Score {
   created_at: string
 }
 
+type ScoreMap = Record<string, Score[]>
+
+function key(timeLimit: TimeOption, mode: Mode) {
+  return `${timeLimit}-${mode}`
+}
+
 export default function Leaderboard() {
   const { t } = useTranslation()
   const [timeLimit, setTimeLimit] = useState<TimeOption>(60)
-  const [mode, setMode] = useState<'chinese' | 'english'>('chinese')
-  const [scores, setScores] = useState<Score[]>([])
+  const [mode, setMode] = useState<Mode>('chinese')
+  const [scoreMap, setScoreMap] = useState<ScoreMap>({})
   const [loading, setLoading] = useState(true)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
@@ -30,24 +37,43 @@ export default function Leaderboard() {
   }, [])
 
   useEffect(() => {
-    setLoading(true)
-    supabase
-      .from('typing_scores')
-      .select('*')
-      .eq('time_limit', timeLimit)
-      .eq('mode', mode)
-      .order('wpm', { ascending: false })
-      .limit(50)
-      .then(({ data }) => {
-        setScores(data ?? [])
-        setLoading(false)
-      })
-  }, [timeLimit, mode])
+    const combos: Array<{ timeLimit: TimeOption; mode: Mode }> = TIME_OPTIONS.flatMap((t) =>
+      (['chinese', 'english'] as const).map((m) => ({ timeLimit: t, mode: m }))
+    )
 
+    Promise.all(
+      combos.map(({ timeLimit: tl, mode: m }) =>
+        supabase
+          .from('typing_scores')
+          .select('*')
+          .eq('time_limit', tl)
+          .eq('mode', m)
+          .order('wpm', { ascending: false })
+          .limit(10)
+          .then(({ data }) => ({ k: key(tl, m), data: data ?? [] }))
+      )
+    ).then((results) => {
+      const map: ScoreMap = {}
+      for (const { k, data } of results) map[k] = data
+
+      setScoreMap(map)
+
+      // default to first combo that has data
+      const first = combos.find(({ timeLimit: tl, mode: m }) => (map[key(tl, m)]?.length ?? 0) > 0)
+      if (first) {
+        setTimeLimit(first.timeLimit)
+        setMode(first.mode)
+      }
+
+      setLoading(false)
+    })
+  }, [])
+
+  const scores = scoreMap[key(timeLimit, mode)] ?? []
   const rankIcon = (i: number) => (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : String(i + 1))
 
   return (
-    <div className="fixed inset-x-0 bottom-0 top-14 bg-background text-foreground overflow-auto">
+    <div className="fixed inset-x-0 bottom-0 top-16 bg-background text-foreground overflow-auto">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-primary mb-8">{t('leaderboard.title')}</h1>
 
@@ -114,9 +140,7 @@ export default function Leaderboard() {
                       <td className="px-4 py-3 font-mono text-muted-foreground">{rankIcon(i)}</td>
                       <td className="px-4 py-3 font-medium">
                         {score.nickname}
-                        {isMe && (
-                          <span className="ml-2 text-xs text-primary/70">(you)</span>
-                        )}
+                        {isMe && <span className="ml-2 text-xs text-primary/70">(you)</span>}
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-semibold text-primary">
                         {score.wpm}
@@ -125,7 +149,7 @@ export default function Leaderboard() {
                         {score.accuracy}%
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground hidden sm:table-cell">
-                        {new Date(score.created_at).toLocaleDateString()}
+                        {new Date(score.created_at).toLocaleString()}
                       </td>
                     </tr>
                   )
