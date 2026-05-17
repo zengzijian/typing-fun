@@ -77,7 +77,7 @@ export function SubmitScore({ wpm, accuracy, timeLimit, mode, onClose, onSuccess
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-sm dialog-enter" onClick={(e) => e.stopPropagation()}>
         {status === 'success' ? (
           <div className="text-center">
             <div className="text-5xl mb-4">🎉</div>

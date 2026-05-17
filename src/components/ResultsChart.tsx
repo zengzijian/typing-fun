@@ -1,6 +1,7 @@
 import {
-  LineChart,
+  ComposedChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
@@ -27,7 +28,13 @@ export function ResultsChart({ data, height = 160, fontSize = 12, dotRadius = 3 
   const { t } = useTranslation()
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data}>
+      <ComposedChart data={data}>
+        <defs>
+          <linearGradient id="wpmGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+          </linearGradient>
+        </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
         <XAxis
           dataKey="time"
@@ -51,6 +58,7 @@ export function ResultsChart({ data, height = 160, fontSize = 12, dotRadius = 3 
           cursor={{ stroke: 'hsl(var(--border))' }}
         />
         <Legend wrapperStyle={{ fontSize }} />
+        <Area type="monotone" dataKey="wpm" stroke="none" fill="url(#wpmGradient)" legendType="none" />
         <Line
           type="monotone"
           dataKey="wpm"
@@ -70,7 +78,7 @@ export function ResultsChart({ data, height = 160, fontSize = 12, dotRadius = 3 
           dot={{ r: dotRadius, fill: 'hsl(var(--destructive))' }}
           activeDot={{ r: dotRadius + 2 }}
         />
-      </LineChart>
+      </ComposedChart>
     </ResponsiveContainer>
   )
 }

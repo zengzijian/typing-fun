@@ -41,18 +41,18 @@ export function IdeCamouflage({ timeLeft, wpm, activeFile, children, themeId = '
             className="w-[14px] h-[14px] rounded-full bg-red-500/70 group-hover:bg-red-500 transition-colors cursor-pointer flex items-center justify-center"
             title="退出摸鱼模式"
           >
-            <svg className="hidden group-hover:block w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#7a0000" strokeWidth="1.2" strokeLinecap="round">
+            <svg className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#7a0000" strokeWidth="1.2" strokeLinecap="round">
               <line x1="1" y1="1" x2="5" y2="5" />
               <line x1="5" y1="1" x2="1" y2="5" />
             </svg>
           </button>
           <span className="w-[14px] h-[14px] rounded-full bg-yellow-500/70 group-hover:bg-yellow-500 transition-colors flex items-center justify-center">
-            <svg className="hidden group-hover:block w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#6a4400" strokeWidth="1.2" strokeLinecap="round">
+            <svg className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#6a4400" strokeWidth="1.2" strokeLinecap="round">
               <line x1="1" y1="3" x2="5" y2="3" />
             </svg>
           </span>
           <span className="w-[14px] h-[14px] rounded-full bg-green-500/70 group-hover:bg-green-500 transition-colors flex items-center justify-center">
-            <svg className="hidden group-hover:block w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#006420" strokeWidth="1.2" strokeLinecap="round">
+            <svg className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-1.5 h-1.5" viewBox="0 0 6 6" fill="none" stroke="#006420" strokeWidth="1.2" strokeLinecap="round">
               <line x1="1" y1="5" x2="5" y2="1" />
               <line x1="3" y1="1" x2="5" y2="1" /><line x1="5" y1="1" x2="5" y2="3" />
               <line x1="1" y1="3" x2="1" y2="5" /><line x1="1" y1="5" x2="3" y2="5" />
@@ -182,7 +182,7 @@ function MiniThemeSelector({ themeId, onThemeChange }: { themeId: string; onThem
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded shadow-xl z-50 w-44 max-h-64 overflow-y-auto">
+        <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded shadow-xl z-50 w-44 max-h-64 overflow-y-auto dropdown-enter">
           {CAMOUFLAGE_THEMES.map((t) => (
             <button
               key={t.id}

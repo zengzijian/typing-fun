@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Keyboard, Box, Crosshair, Trophy } from "lucide-react";
+import { Keyboard, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const LANGS = ["en", "zh-CN", "zh-HK"] as const;
@@ -17,9 +17,9 @@ const LANG_TOOLTIPS: Record<Lang, string> = {
   en: "English",
 };
 
-function Tooltip({ label, children }: { label: string; children: React.ReactNode }) {
+function Tooltip({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="relative group/tip">
+    <div className={`relative group/tip ${className}`}>
       {children}
       <span className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded bg-popover text-popover-foreground text-xs whitespace-nowrap shadow-md opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150 z-50">
         {label}
@@ -35,8 +35,6 @@ const Navigation = () => {
 
   const navItems = [
     { path: "/", label: t("nav.typing"), icon: Keyboard },
-    { path: "/mech-game", label: t("nav.mechGame"), icon: Crosshair },
-    { path: "/models", label: t("nav.models"), icon: Box },
     { path: "/ranking", label: t("nav.leaderboard"), icon: Trophy },
   ];
 
@@ -69,11 +67,11 @@ const Navigation = () => {
             );
           })}
 
-          <div className="ml-2 flex items-center rounded-md border border-border overflow-hidden">
+          <div className="ml-2 flex items-stretch rounded-md border border-border overflow-hidden">
             {LANGS.map((lang) => {
               const isActive = currentLang === lang;
               return (
-                <Tooltip key={lang} label={LANG_TOOLTIPS[lang]}>
+                <Tooltip key={lang} label={LANG_TOOLTIPS[lang]} className="flex">
                   <button
                     onClick={() => i18n.changeLanguage(lang)}
                     className={`px-2 py-1 text-xs font-medium transition-colors cursor-pointer ${

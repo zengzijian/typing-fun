@@ -550,22 +550,22 @@ export const defaultThemeId = 'one-dark'
 
 const SHARED_THEME_IDS = [
   'one-dark',
-  'tokyo-night',
-  'catppuccin',
-  'material-ocean',
-  'night-owl',
-  'nord',
   'dracula',
   'monokai',
+  'tokyo-night',
+  'catppuccin',
+  'nord',
   'gruvbox',
+  'material-ocean',
+  'night-owl',
   'synthwave',
   'horizon',
-  'vscode-light',
   'github-light',
+  'vscode-light',
   'solarized-light',
 ] as const
 
-export const sharedThemes = themes.filter((t) => (SHARED_THEME_IDS as readonly string[]).includes(t.id))
+export const sharedThemes = (SHARED_THEME_IDS as readonly string[]).map((id) => themes.find((t) => t.id === id)!)
 
 // kept for IdeCamouflage compatibility
 export const CAMOUFLAGE_THEMES = sharedThemes

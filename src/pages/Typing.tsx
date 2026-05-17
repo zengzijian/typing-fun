@@ -218,7 +218,7 @@ function Typing() {
         return
       }
 
-      if (e.key === 'F1' || (e.ctrlKey && e.key === '\\')) {
+      if (e.key === 'F1' || ((e.ctrlKey || e.metaKey) && e.key === '\\')) {
         e.preventDefault()
         setIsCamouflage((prev) => {
           const next = !prev
@@ -634,8 +634,8 @@ function Typing() {
               </div>
               {isFocusMode && !isComplete && (
                 <>
-                  <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
-                  <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+                  <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10" style={{ height: 0, background: 'linear-gradient(to bottom, hsl(var(--background)) 40%, transparent)' }} />
+                  <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10" style={{ top: '100%', background: 'linear-gradient(to top, hsl(var(--background)) 40%, transparent)' }} />
                 </>
               )}
             </div>
@@ -661,8 +661,8 @@ function Typing() {
             </div>
             {isFocusMode && (
               <>
-                <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10 bg-background" style={{ height: 0 }} />
-                <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 bg-background" style={{ top: '100%' }} />
+                <div ref={focusTopOverlayRef} className="absolute inset-x-0 top-0 pointer-events-none z-10" style={{ height: 0, background: 'linear-gradient(to bottom, hsl(var(--background)) 40%, transparent)' }} />
+                <div ref={focusBottomOverlayRef} className="absolute inset-x-0 bottom-0 pointer-events-none z-10" style={{ top: '100%', background: 'linear-gradient(to top, hsl(var(--background)) 40%, transparent)' }} />
               </>
             )}
           </div>

@@ -55,7 +55,7 @@ export function ThemeSelector({ themeId, themes, onThemeChange }: Props) {
       {open && (
         <div
           ref={listRef}
-          className="absolute bottom-full mb-1.5 left-0 bg-card border border-border rounded-md shadow-xl z-50 w-48 max-h-72 overflow-y-auto"
+          className="absolute bottom-full mb-1.5 left-0 bg-card border border-border rounded-md shadow-xl z-50 w-48 max-h-72 overflow-y-auto dropdown-enter"
         >
           {themes.map((t) => (
             <button
